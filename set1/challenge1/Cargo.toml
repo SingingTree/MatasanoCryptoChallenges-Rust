@@ -1,5 +1,9 @@
 [package]
 
-name = "challenge1"
+name = "matasano.set1.challenge1"
 version = "0.0.1"
 authors = ["SingingTree"]
+
+[[bin]]
+
+name = "convertoHexToBase64"
