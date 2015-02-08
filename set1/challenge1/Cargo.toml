@@ -4,6 +4,9 @@ name = "matasano.set1.challenge1"
 version = "0.0.1"
 authors = ["SingingTree"]
 
+[dependencies]
+rustc-serialize = "0.2"
+
 [[bin]]
 
 name = "convertoHexToBase64"
