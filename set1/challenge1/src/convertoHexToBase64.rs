@@ -175,10 +175,14 @@ fn decode(chars_to_decode : &Vec<char>) -> Result<Vec<u8>, String> {
 	}
 
 	decoded_bytes.push(first_decoded_byte);
-	decoded_bytes.push(second_decoded_byte);
 	if(chars_to_decode[i + 2] != '=') {
+		decoded_bytes.push(second_decoded_byte);
+	} 
+	if(chars_to_decode[i + 3] != '=') {
 		decoded_bytes.push(third_decoded_byte);
 	}
+
+	println!("{:?}, {:?}, {:?}", chars_to_decode[i + 1], chars_to_decode[i + 2], chars_to_decode[i + 3]);
 
 
 
@@ -190,7 +194,7 @@ fn decode(chars_to_decode : &Vec<char>) -> Result<Vec<u8>, String> {
 
 fn main() {
 	// Testing stuff!
-	let input_bytes1 = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d".from_hex();
+	let input_bytes1 = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d75736872".from_hex();
 	
 	match input_bytes1  {
 		Ok(bytes) => {
