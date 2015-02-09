@@ -182,21 +182,14 @@ fn decode(chars_to_decode : &Vec<char>) -> Result<Vec<u8>, String> {
 		decoded_bytes.push(third_decoded_byte);
 	}
 
-	println!("{:?}, {:?}, {:?}", chars_to_decode[i + 1], chars_to_decode[i + 2], chars_to_decode[i + 3]);
-
-
-
-	println!("{:?}", num_bytes_to_decode - i);
-
-
 	return Ok(decoded_bytes);
 }
 
 fn main() {
 	// Testing stuff!
-	let input_bytes1 = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d75736872".from_hex();
+	let input_bytes = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d".from_hex();
 	
-	match input_bytes1  {
+	match input_bytes  {
 		Ok(bytes) => {
 			let encoded_bytes : Vec<char> = encode(&bytes);
 			println!("Test: {:?}", encoded_bytes);
@@ -206,7 +199,62 @@ fn main() {
 		Err(e) => {
 			println!("Failed to convert input to bytes with error: {:?}", e);
 		}
-
 	}
+}
 
+#[test]
+fn test_encode() {
+	let input_bytes_result = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d".from_hex();
+	let expected_output = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
+
+	match input_bytes_result {
+		Ok(input_bytes) => {
+			let encoded_string = encode(&input_bytes).into_iter().fold(String::new(), |mut string, c| {string.push(c); string});
+			assert_eq!(expected_output, encoded_string);
+		}
+		Err(e) => {
+			panic!("Failed to convert input to bytes with error: {:?}", e);
+		}
+	}
+}
+
+#[test]
+fn test_decode() {
+	let input_chars : Vec<char> = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t".chars().collect();
+	let expected_output_result = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d".from_hex();
+
+	match expected_output_result {
+		Ok(expected_output) => {
+			let decoded_bytes_result = decode(&input_chars);
+			match decoded_bytes_result {
+				Ok(decoded_bytes) => assert_eq!(expected_output, decoded_bytes),
+				Err(e) => {
+					panic!("Failed to decode base64 string with error: {:?}", e);
+				}
+			}
+		},
+		Err(e) => {
+			panic!("Failed to convert input to bytes with error: {:?}", e);
+		}
+	}	
+}
+
+#[test]
+fn test_roundtrip() {
+	let input_bytes_result = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d".from_hex();
+	match input_bytes_result {
+		Ok(input_bytes) => {
+			let encoded_chars= encode(&input_bytes);
+			let decoded_bytes_result = decode(&encoded_chars);
+			match decoded_bytes_result {
+				Ok(decoded_bytes) => assert_eq!(input_bytes, decoded_bytes),
+				Err(e) => {
+					panic!("Failed to decode base64 string with error: {:?}", e);
+				}
+			}
+		}
+		Err(e) => {
+			panic!("Failed to convert input to bytes with error: {:?}", e);
+		}
+	}
 }
