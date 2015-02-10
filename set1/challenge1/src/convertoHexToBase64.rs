@@ -198,25 +198,9 @@ impl Base64Decodable for Vec<char> {
 
 impl Base64Decodable for Vec<u8> {
 	fn from_base64_to_u8_vec(self : &Vec<u8>) -> Result<Vec<u8>, String> {
-		let charVec : Vec<char> = self.iter().map(|&c| c as char).collect();
-		return charVec.from_base64_to_u8_vec();
+		let char_vec : Vec<char> = self.iter().map(|&c| c as char).collect();
+		return char_vec.from_base64_to_u8_vec();
 	}
-}
-fn main() {
-	// // Testing stuff!
-	// let input_bytes = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d".from_hex();
-	
-	// match input_bytes  {
-	// 	Ok(bytes) => {
-	// 		let encoded_bytes : Vec<char> = encode(&bytes);
-	// 		println!("Test: {:?}", encoded_bytes);
-	// 		let decoded_bytes = decode(&encoded_bytes);
-	// 		println!("Test {:?}",  decoded_bytes.unwrap().as_slice().to_hex());
-	// 	}
-	// 	Err(e) => {
-	// 		println!("Failed to convert input to bytes with error: {:?}", e);
-	// 	}
-	// }
 }
 
 #[test]
