@@ -1,13 +1,13 @@
 extern crate "rustc-serialize" as rustc_serialize;
 use rustc_serialize::hex::FromHex;
 
-trait FixedXor {
-	fn fixed_xor(&self, other: &Vec<u8>) -> Vec<u8>;
+trait FixedXor<T> {
+	fn fixed_xor<'a>(&self, other: &'a T);
 }
 
-impl FixedXor for Vec<u8> {
-	fn fixed_xor(self : &Vec<u8>, other : &Vec<u8>) {
-
+impl FixedXor<Vec<u8>> for Vec<u8> {
+	fn fixed_xor<'a>(self : &Vec<u8>, other: &'a Vec<u8>) {
+		//return vec!();
 	}
 }
 
