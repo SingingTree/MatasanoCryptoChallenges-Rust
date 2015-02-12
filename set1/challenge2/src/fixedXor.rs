@@ -2,7 +2,7 @@ extern crate "rustc-serialize" as rustc_serialize;
 use rustc_serialize::hex::FromHex;
 
 trait FixedXor<T> {
-	fn fixed_xor<'a>(&self, other: & T) -> Result<Vec<u8>, String>;
+	fn fixed_xor(&self, other: & T) -> Result<Vec<u8>, String>;
 }
 
 impl FixedXor<Vec<u8>> for Vec<u8> {
