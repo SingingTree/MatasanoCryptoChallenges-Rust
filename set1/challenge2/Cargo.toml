@@ -1,12 +1,8 @@
 [package]
 
-name = "matasano.set1.challenge2"
+name = "fixed_xor"
 version = "0.1.0"
 authors = ["SingingTree"]
 
 [dependencies]
 rustc-serialize = "0.2"
-
-[[bin]]
-
-name = "fixedXor"
