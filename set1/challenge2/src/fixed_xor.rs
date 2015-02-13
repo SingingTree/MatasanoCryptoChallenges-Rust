@@ -1,4 +1,4 @@
-trait FixedXor<T> {
+pub trait FixedXor<T> {
 	fn fixed_xor(&self, other: & T) -> Result<Vec<u8>, String>;
 }
 
