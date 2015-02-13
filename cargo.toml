@@ -1,7 +1,7 @@
 [package]
 
-name = "base64"
-version = "0.1.1"
+name = "matasano_crypto_challenges"
+version = "0.1.2"
 authors = ["SingingTree"]
 
 [dependencies]

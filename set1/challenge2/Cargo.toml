@@ -1,8 +1,0 @@
-[package]
-
-name = "fixed_xor"
-version = "0.1.1"
-authors = ["SingingTree"]
-
-[dependencies]
-rustc-serialize = "0.2"
