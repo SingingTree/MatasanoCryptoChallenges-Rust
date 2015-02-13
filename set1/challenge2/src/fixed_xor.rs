@@ -16,6 +16,7 @@ impl FixedXor<Vec<u8>> for Vec<u8> {
 	}
 }
 
+#[cfg(test)]
 mod tests {
 	use fixed_xor::FixedXor;
 	use rustc_serialize::hex::FromHex;

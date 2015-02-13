@@ -201,7 +201,8 @@ impl Base64Decodable for Vec<u8> {
 	}
 }
 
-mod tests{
+#[cfg(test)]
+mod tests {
 	use base64::{Base64Encodable, Base64Decodable};
 	use rustc_serialize::hex::FromHex;
 
