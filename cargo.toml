@@ -1,0 +1,8 @@
+[package]
+
+name = "matasano_crypto_challenges"
+version = "0.1.2"
+authors = ["SingingTree"]
+
+[dependencies]
+rustc-serialize = "0.2"

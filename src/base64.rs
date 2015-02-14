@@ -1,5 +1,3 @@
-extern crate "rustc-serialize" as rustc_serialize;
-use rustc_serialize::hex::FromHex;
 use std::collections::HashMap;
 
 // rustc-serialize could do all of this, but that would take some of the fun out of the challenge, I suppose
@@ -203,59 +201,65 @@ impl Base64Decodable for Vec<u8> {
 	}
 }
 
-#[test]
-fn test_encode() {
-	let input_bytes_result = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d".from_hex();
-	let expected_output = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
+#[cfg(test)]
+mod tests {
+	use base64::{Base64Encodable, Base64Decodable};
+	use rustc_serialize::hex::FromHex;
 
-	match input_bytes_result {
-		Ok(input_bytes) => {
-			let encoded_string = input_bytes.to_base64_char_vec().into_iter().fold(String::new(), |mut string, c| {string.push(c); string});
-			assert_eq!(expected_output, encoded_string);
-		}
-		Err(e) => {
-			panic!("Failed to convert input to bytes with error: {:?}", e);
+	#[test]
+	fn test_encode() {
+		let input_bytes_result = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d".from_hex();
+		let expected_output = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t";
+
+		match input_bytes_result {
+			Ok(input_bytes) => {
+				let encoded_string = input_bytes.to_base64_char_vec().into_iter().fold(String::new(), |mut string, c| {string.push(c); string});
+				assert_eq!(expected_output, encoded_string);
+			}
+			Err(e) => {
+				panic!("Failed to convert input to bytes with error: {:?}", e);
+			}
 		}
 	}
-}
 
-#[test]
-fn test_decode() {
-	let input_chars : Vec<char> = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t".chars().collect();
-	let expected_output_result = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d".from_hex();
+	#[test]
+	fn test_decode() {
+		let input_chars : Vec<char> = "SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t".chars().collect();
+		let expected_output_result = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d".from_hex();
 
-	match expected_output_result {
-		Ok(expected_output) => {
-			let decoded_bytes_result = input_chars.from_base64_to_u8_vec();
-			match decoded_bytes_result {
-				Ok(decoded_bytes) => assert_eq!(expected_output, decoded_bytes),
-				Err(e) => {
-					panic!("Failed to decode base64 string with error: {:?}", e);
+		match expected_output_result {
+			Ok(expected_output) => {
+				let decoded_bytes_result = input_chars.from_base64_to_u8_vec();
+				match decoded_bytes_result {
+					Ok(decoded_bytes) => assert_eq!(expected_output, decoded_bytes),
+					Err(e) => {
+						panic!("Failed to decode base64 string with error: {:?}", e);
+					}
+				}
+			},
+			Err(e) => {
+				panic!("Failed to convert input to bytes with error: {:?}", e);
+			}
+		}	
+	}
+
+	#[test]
+	fn test_roundtrip() {
+		let input_bytes_result = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d".from_hex();
+		match input_bytes_result {
+			Ok(input_bytes) => {
+				let encoded_chars= input_bytes.to_base64_char_vec();
+				let decoded_bytes_result = encoded_chars.from_base64_to_u8_vec();
+				match decoded_bytes_result {
+					Ok(decoded_bytes) => assert_eq!(input_bytes, decoded_bytes),
+					Err(e) => {
+						panic!("Failed to decode base64 string with error: {:?}", e);
+					}
 				}
 			}
-		},
-		Err(e) => {
-			panic!("Failed to convert input to bytes with error: {:?}", e);
-		}
-	}	
-}
-
-#[test]
-fn test_roundtrip() {
-	let input_bytes_result = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d".from_hex();
-	match input_bytes_result {
-		Ok(input_bytes) => {
-			let encoded_chars= input_bytes.to_base64_char_vec();
-			let decoded_bytes_result = encoded_chars.from_base64_to_u8_vec();
-			match decoded_bytes_result {
-				Ok(decoded_bytes) => assert_eq!(input_bytes, decoded_bytes),
-				Err(e) => {
-					panic!("Failed to decode base64 string with error: {:?}", e);
-				}
+			Err(e) => {
+				panic!("Failed to convert input to bytes with error: {:?}", e);
 			}
-		}
-		Err(e) => {
-			panic!("Failed to convert input to bytes with error: {:?}", e);
 		}
 	}
 }
