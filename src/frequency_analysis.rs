@@ -4,15 +4,15 @@ use std::collections::btree_map::{BTreeMap, Entry};
 trait FrenquencyAnalysable {
 	type Item : Ord;
 
-	fn frequencies(&self) -> BTreeMap<Self::Item, usize>;
+	fn frequencies(self) -> BTreeMap<Self::Item, usize>;
 }
 
 
-impl<'a, T : Ord> FrenquencyAnalysable for [T] {
+impl<'a, T : Ord> FrenquencyAnalysable for &'a [T] {
 	type Item = &'a T;
 
-	fn frequencies<'b>(self : &'b [T]) -> BTreeMap<&'b T, usize> {
-		let mut frequencies : BTreeMap<&'b T, usize> = BTreeMap::new();
+	fn frequencies(self) -> BTreeMap<&'a T, usize> {
+		let mut frequencies : BTreeMap<&'a T, usize> = BTreeMap::new();
 		for item in self.iter() {
 			match frequencies.entry(item) {
 				Entry::Vacant(entry) => { entry.insert(1); },
@@ -23,10 +23,10 @@ impl<'a, T : Ord> FrenquencyAnalysable for [T] {
 	}
 }
 
-impl FrenquencyAnalysable for str {
+impl<'a> FrenquencyAnalysable for &'a str {
 	type Item = char;
 
-	fn frequencies(self : &str) -> BTreeMap<char, usize> {
+	fn frequencies(self) -> BTreeMap<char, usize> {
 		let mut frequencies : BTreeMap<char, usize> = BTreeMap::new();
 		for item in self.chars() {
 			match frequencies.entry(item) {
@@ -51,7 +51,7 @@ mod tests {
 
 	#[test]
 	fn count_nums_test() {
-		let nums = [5, 4, 3, 2, 1, 5];
+		let mut nums = [5, 4, 3, 2, 1, 5];
 		let freqs = nums.frequencies();
 		assert_eq!(freqs.get(&5), Some(&2));
 	}
