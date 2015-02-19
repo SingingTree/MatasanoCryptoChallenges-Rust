@@ -1,14 +1,14 @@
 use std::collections::btree_map::{BTreeMap, Entry};
 
 
-trait FrenquencyAnalysable {
+trait FrequencyAnalysable {
 	type Item : Ord;
 
 	fn frequencies(self) -> BTreeMap<Self::Item, usize>;
 }
 
 
-impl<'a, T : Ord> FrenquencyAnalysable for &'a [T] {
+impl<'a, T : Ord> FrequencyAnalysable for &'a [T] {
 	type Item = &'a T;
 
 	fn frequencies(self) -> BTreeMap<&'a T, usize> {
@@ -23,7 +23,7 @@ impl<'a, T : Ord> FrenquencyAnalysable for &'a [T] {
 	}
 }
 
-impl<'a> FrenquencyAnalysable for &'a str {
+impl<'a> FrequencyAnalysable for &'a str {
 	type Item = char;
 
 	fn frequencies(self) -> BTreeMap<char, usize> {
@@ -40,7 +40,7 @@ impl<'a> FrenquencyAnalysable for &'a str {
 
 #[cfg(test)]
 mod tests {
-	use frequency_analysis::FrenquencyAnalysable;
+	use frequency_analysis::FrequencyAnalysable;
 
 	#[test]
 	fn count_letters_test() {
