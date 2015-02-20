@@ -1,42 +1,42 @@
 use std::collections::btree_map::{BTreeMap, Entry};
+use std::iter::IntoIterator;
 
 
 trait FrequencyAnalysable {
 	type Item : Ord;
 
-	fn frequencies(self) -> BTreeMap<Self::Item, usize>;
+	fn occurrences(self) -> BTreeMap<Self::Item, usize>;
 }
 
+fn occurrences_from_iter<I : Iterator>(iter : I) -> BTreeMap<<I as Iterator>::Item, usize>
+where <I as Iterator>::Item: Ord {
+    let mut occurrences = BTreeMap::new();
+    for item in iter {
+        match occurrences.entry(item) {
+            Entry::Vacant(entry) => { entry.insert(1); }
+            Entry::Occupied(entry) => { *entry.into_mut() += 1; }
+        }
+    }
+    return occurrences;
+}
 
-impl<'a, T : Ord> FrequencyAnalysable for &'a [T] {
-	type Item = &'a T;
+impl<II : IntoIterator> FrequencyAnalysable for II
+where <<Self as IntoIterator>::IntoIter as Iterator>::Item: Ord {
+    type Item = <<Self as IntoIterator>::IntoIter as Iterator>::Item;
 
-	fn frequencies(self) -> BTreeMap<&'a T, usize> {
-		let mut frequencies : BTreeMap<&'a T, usize> = BTreeMap::new();
-		for item in self.iter() {
-			match frequencies.entry(item) {
-				Entry::Vacant(entry) => { entry.insert(1); },
-				Entry::Occupied(mut entry) => *entry.get_mut() += 1,
-			}
-		}
-		return frequencies;
-	}
+    fn occurrences(self) -> BTreeMap<<II as FrequencyAnalysable>::Item, usize> {
+        return occurrences_from_iter(self.into_iter());
+    }
 }
 
 impl<'a> FrequencyAnalysable for &'a str {
-	type Item = char;
+   type Item = char;
 
-	fn frequencies(self) -> BTreeMap<char, usize> {
-		let mut frequencies : BTreeMap<char, usize> = BTreeMap::new();
-		for item in self.chars() {
-			match frequencies.entry(item) {
-				Entry::Vacant(entry) => { entry.insert(1); },
-				Entry::Occupied(mut entry) => *entry.get_mut() += 1,
-			}
-		}
-		return frequencies;
+	fn occurrences(self) -> BTreeMap<char, usize> {
+		return occurrences_from_iter(self.chars());
 	}
 }
+
 
 #[cfg(test)]
 mod tests {
@@ -45,14 +45,14 @@ mod tests {
 	#[test]
 	fn count_letters_test() {
 		let hello : &str = "Hello";
-		let freqs = hello.frequencies();
+		let freqs = hello.occurrences();
 		assert_eq!(freqs.get(&'l'), Some(&2));
 	}
 
 	#[test]
 	fn count_nums_test() {
-		let mut nums = [5, 4, 3, 2, 1, 5];
-		let freqs = nums.frequencies();
+		let nums = [5, 4, 3, 2, 1, 5];
+		let freqs = nums.occurrences();
 		assert_eq!(freqs.get(&5), Some(&2));
 	}
 }
