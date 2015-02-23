@@ -2,7 +2,7 @@ use std::collections::btree_map::{BTreeMap, Entry};
 use std::iter::IntoIterator;
 
 
-trait FrequencyAnalysable {
+pub trait FrequencyAnalysable {
 	type Item : Ord;
 
 	// Returns a BTreeMap from the items in self to their number of occurrences
@@ -66,7 +66,7 @@ impl<'a> FrequencyAnalysable for &'a str {
 	}
 }
 
-fn english_letter_frequencies() -> BTreeMap<char, f32> {
+pub fn english_letter_frequencies() -> BTreeMap<char, f32> {
     let mut frequencies = BTreeMap::new();
     frequencies.insert('a', 0.08167);
     frequencies.insert('b', 0.01167);

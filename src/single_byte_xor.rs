@@ -1,15 +1,32 @@
+use std::cmp::Ordering;
+use std::collections::btree_map::BTreeMap;
+use frequency_analysis::{self, FrequencyAnalysable};
+
+pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : BTreeMap<char, f32>) {
+	let byte_freqs = bytes.frequencies();
+	let mut bytes_by_freq : Vec<(&u8, f32)> = byte_freqs.into_iter().collect();
+	bytes_by_freq.sort_by(|&(_, a), &(_, b )| if a > b {Ordering::Less} else {Ordering::Greater});
+	let mut characters_by_freq : Vec<(char, f32)> = character_frequencies.into_iter().collect();
+	characters_by_freq.sort_by(|&(_, a), &(_, b )| if a > b {Ordering::Less} else {Ordering::Greater});
+
+	for (k, v) in bytes_by_freq {
+		println!("{}: {}", k, v);
+	}
+
+	for (k, v) in characters_by_freq {
+		println!("{}: {}", k, v);
+	}
+}
+
 #[cfg(test)]
 mod tests {
-	use fixed_xor::FixedXor;
 	use rustc_serialize::hex::FromHex;
+	use frequency_analysis::FrequencyAnalysable;
 
 	#[test]
-	fn test_single_bytes() {
-		let hex_buffer1 = "1c0111001f010100061a024b53535009181c".from_hex().unwrap();
-		let hex_buffer2 = "686974207468652062756c6c277320657965".from_hex().unwrap();
-		let expected_output = "746865206b696420646f6e277420706c6179".from_hex().unwrap();
-
-		let result_of_or : Vec<u8> = hex_buffer1.fixed_xor(&hex_buffer2).unwrap();;
-		assert_eq!(expected_output, result_of_or);
+	fn frequencies_of_buffer() {
+		let hex_buffer = "1c1c1c".from_hex().unwrap();
+		let freqs = hex_buffer.frequencies();
+		assert!(freqs.get(&0x1c) > Some(&0.99) && freqs.get(&5) < Some(&1.01));
 	}
 }
