@@ -9,13 +9,32 @@ pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : BTr
 	let mut characters_by_freq : Vec<(char, f32)> = character_frequencies.into_iter().collect();
 	characters_by_freq.sort_by(|&(_, a), &(_, b )| if a > b {Ordering::Less} else {Ordering::Greater});
 
-	for (k, v) in bytes_by_freq {
-		println!("{}: {}", k, v);
-	}
+	let key = bytes_by_freq[1].0 ^ (characters_by_freq[3].0 as u8);
 
-	for (k, v) in characters_by_freq {
-		println!("{}: {}", k, v);
+	println!("Byte is {}", key);
+
+	println!("{:?}", bytes);
+
+	// Brute force for exploration
+	// for i in range(0, 255) {
+	// 	for b in bytes {
+	// 		print!("{}", (b ^ i) as char);
+	// 	}
+	// 	println!("");
+	// }
+
+	for b in bytes {
+		print!("{}", (b ^ key) as char);
 	}
+	println!("");
+
+	// for (k, v) in bytes_by_freq {
+	// 	println!("{}: {}", k, v);
+	// }
+
+	// for (k, v) in characters_by_freq {
+	// 	println!("{}: {}", k, v);
+	// }
 }
 
 #[cfg(test)]
