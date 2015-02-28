@@ -1,6 +1,6 @@
 use std::collections::btree_map::{BTreeMap, Entry};
 use std::iter::IntoIterator;
-
+use std::num::Float;
 
 pub trait FrequencyAnalysable {
 	type Item : Ord;
@@ -42,7 +42,7 @@ where <I as Iterator>::Item: Ord {
 }
 
 impl<II : IntoIterator> FrequencyAnalysable for II
-where <<Self as IntoIterator>::IntoIter as Iterator>::Item: Ord {
+where <<Self as IntoIterator>::IntoIter as Iterator>::Item : Ord {
     type Item = <<Self as IntoIterator>::IntoIter as Iterator>::Item;
 
     fn occurrences(self) -> BTreeMap<<II as FrequencyAnalysable>::Item, usize> {
@@ -64,6 +64,21 @@ impl<'a> FrequencyAnalysable for &'a str {
 	fn frequencies(self) -> BTreeMap<char, f32> {
 		return frequencies_from_iter(self.chars());
 	}
+}
+
+pub fn character_frequency_distance<II : IntoIterator>(characters : II, character_frequencies : &BTreeMap<char, f32>) -> f32
+where <<II as IntoIterator>::IntoIter as IntoIterator>::Item : Ord + CharExt {
+    let character_freqs = characters.frequencies();
+    let mut difference_from_specified_freqs = 0.0;
+    for (k, v) in character_freqs {
+            // Calculate freq difference here by taking difference between actual and ideal char occurrence and adding it to the difference
+            match character_frequencies.get(&k.to_lowercase()) {
+                None => {difference_from_specified_freqs += v}
+                Some(frequency) => { difference_from_specified_freqs += (*frequency - v).abs(); }
+            }
+        }
+
+    return difference_from_specified_freqs;
 }
 
 pub fn english_letter_frequencies() -> BTreeMap<char, f32> {
