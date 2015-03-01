@@ -81,6 +81,21 @@ where <<II as IntoIterator>::IntoIter as IntoIterator>::Item : Ord + CharExt {
     return difference_from_specified_freqs;
 }
 
+pub fn alphabetic_uppercase_frequency<II : IntoIterator>(characters : II) -> f32
+where <<II as IntoIterator>::IntoIter as IntoIterator>::Item : CharExt + Clone {
+    let mut total_alphabetic : f32 = 0.0;
+    let mut uppercase_alphabetic : f32 = 0.0;
+    for c in characters {
+        if c.clone().is_alphabetic() {
+            total_alphabetic += 1.0;
+            if c.is_uppercase() {
+                uppercase_alphabetic += 1.0;
+            }
+        }
+    }
+    return uppercase_alphabetic / total_alphabetic;
+}
+
 pub fn english_letter_frequencies() -> BTreeMap<char, f32> {
     let mut frequencies = BTreeMap::new();
     frequencies.insert('a', 0.08167);
@@ -114,7 +129,7 @@ pub fn english_letter_frequencies() -> BTreeMap<char, f32> {
 
 #[cfg(test)]
 mod tests {
-	use frequency_analysis::FrequencyAnalysable;
+	use frequency_analysis::{self, FrequencyAnalysable};
 
 	#[test]
 	fn string_occurrence_test() {
@@ -142,5 +157,12 @@ mod tests {
         let nums = [5, 4, 3, 2, 5];
         let freqs = nums.frequencies();
         assert!(freqs.get(&5) > Some(&0.39) && freqs.get(&5) < Some(&0.41));
+    }
+
+    #[test]
+    fn string_uppercase_ratio() {
+        let word = "Hello";
+        let ratio = frequency_analysis::alphabetic_uppercase_frequency(word.chars());
+        assert!(ratio > 0.19 && ratio < 0.21);
     }
 }
