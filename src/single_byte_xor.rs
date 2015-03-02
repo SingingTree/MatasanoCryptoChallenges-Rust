@@ -1,6 +1,5 @@
 use std::cmp::Ordering;
 use std::collections::btree_map::BTreeMap;
-use std::num::Float;
 use frequency_analysis::{self, FrequencyAnalysable};
 
 pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BTreeMap<char, f32>) {
@@ -11,18 +10,22 @@ pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BT
 	// characters_by_freq.sort_by(|&(_, a), &(_, b )| if a > b {Ordering::Less} else {Ordering::Greater});
 
 	//Brute force for exploration
-	let mut possible_decodes : Vec<(Vec<char>, f32)> = Vec::new();
+	let mut possible_decodes : Vec<(String, f32)> = Vec::new();
 	for i in range(0, 255) {
-		let possible_decode : Vec<char> = bytes.iter().map(|&b| (b ^ i) as char).collect();
-		let possible_decode_freq_difference = frequency_analysis::character_frequency_distance(possible_decode.clone(), &character_frequencies);
+		let possible_decode : String = bytes.iter().map(|&b| (b ^ i) as char).collect();
+		let possible_decode_freq_difference = frequency_analysis::character_frequency_distance(possible_decode.chars(), &character_frequencies);
 		possible_decodes.push((possible_decode, possible_decode_freq_difference));
 	}
 
 	possible_decodes.sort_by(|&(_, f1), &(_, f2)| if f1 < f2 {Ordering::Less} else {Ordering::Greater});
 	// possible_decodes.sort_by(|&(ref d1, _), &(ref d2, _)|
-	// 	if frequency_analysis::alphabetic_uppercase_frequency(d1.clone()) < frequency_analysis::alphabetic_uppercase_frequency(d2.clone()) {
+	// 	if d1.to_ascii_lowercase() != d2.to_ascii_lowercase() {
+	// 		Ordering::Equal
+	// 	} else if frequency_analysis::alphabetic_uppercase_frequency(d1.chars()) < frequency_analysis::alphabetic_uppercase_frequency(d2.chars()) {
+	// 		println!("!Equal");
 	// 		Ordering::Less
 	// 	} else {
+	// 		println!("!Equal");
 	// 		Ordering::Greater
 	// 	});
 

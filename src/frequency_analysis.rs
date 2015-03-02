@@ -96,6 +96,19 @@ where <<II as IntoIterator>::IntoIter as IntoIterator>::Item : CharExt + Clone {
     return uppercase_alphabetic / total_alphabetic;
 }
 
+pub fn control_character_frequency<II : IntoIterator>(characters : II) -> f32
+where <<II as IntoIterator>::IntoIter as IntoIterator>::Item : CharExt {
+    let mut total_chars : f32 = 0.0;
+    let mut total_control_chars : f32 = 0.0;
+    for c in characters {
+        total_chars += 1.0;
+        if c.is_control() {
+            total_control_chars += 1.0;
+        }
+    }
+    return total_control_chars / total_chars;
+}
+
 pub fn english_letter_frequencies() -> BTreeMap<char, f32> {
     let mut frequencies = BTreeMap::new();
     frequencies.insert('a', 0.08167);
