@@ -16,9 +16,15 @@ pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BT
 		let possible_decode : Vec<char> = bytes.iter().map(|&b| (b ^ i) as char).collect();
 		let possible_decode_freq_difference = frequency_analysis::character_frequency_distance(possible_decode.clone(), &character_frequencies);
 		possible_decodes.push((possible_decode, possible_decode_freq_difference));
-
-		possible_decodes.sort_by(|&(_, f1), &(_, f2)| if f1 < f2 {Ordering::Less} else {Ordering::Greater});
 	}
+
+	possible_decodes.sort_by(|&(_, f1), &(_, f2)| if f1 < f2 {Ordering::Less} else {Ordering::Greater});
+	// possible_decodes.sort_by(|&(ref d1, _), &(ref d2, _)|
+	// 	if frequency_analysis::alphabetic_uppercase_frequency(d1.clone()) < frequency_analysis::alphabetic_uppercase_frequency(d2.clone()) {
+	// 		Ordering::Less
+	// 	} else {
+	// 		Ordering::Greater
+	// 	});
 
 	for &(ref k, f) in possible_decodes.iter().take(10) {
 		//let f : () = k;
