@@ -1,6 +1,7 @@
 use std::cmp::Ordering;
 use std::collections::btree_map::BTreeMap;
 use frequency_analysis::{self, FrequencyAnalysable};
+use std::ascii::AsciiExt;
 
 pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BTreeMap<char, f32>) {
 	let byte_freqs = bytes.frequencies();

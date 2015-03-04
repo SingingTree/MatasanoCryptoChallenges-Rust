@@ -81,8 +81,8 @@ where <<II as IntoIterator>::IntoIter as IntoIterator>::Item : Ord + CharExt {
     return difference_from_specified_freqs;
 }
 
-pub fn alphabetic_uppercase_frequency<II : IntoIterator>(characters : II) -> f32
-where <<II as IntoIterator>::IntoIter as IntoIterator>::Item : CharExt + Clone {
+pub fn alphabetic_uppercase_frequency<I : Iterator>(characters : I) -> f32
+where <I as Iterator>::Item : CharExt + Clone {
     let mut total_alphabetic : f32 = 0.0;
     let mut uppercase_alphabetic : f32 = 0.0;
     for c in characters {
@@ -96,8 +96,8 @@ where <<II as IntoIterator>::IntoIter as IntoIterator>::Item : CharExt + Clone {
     return uppercase_alphabetic / total_alphabetic;
 }
 
-pub fn control_character_frequency<II : IntoIterator>(characters : II) -> f32
-where <<II as IntoIterator>::IntoIter as IntoIterator>::Item : CharExt {
+pub fn control_character_frequency<I : Iterator>(characters : I) -> f32
+where <I as Iterator>::Item : CharExt {
     let mut total_chars : f32 = 0.0;
     let mut total_control_chars : f32 = 0.0;
     for c in characters {
