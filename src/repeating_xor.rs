@@ -1,14 +1,23 @@
-use std::string::String;
+use std::ops::BitXor;
 
 trait RepeatingXorEncodable {
-	fn repeating_xor_encode(self, rhs : Self) -> Self::Output;
 	type Output;
+
+	fn repeating_xor_encode(self, rhs : Self) -> Self::Output;	
 }
 
-impl<I : Iterator> RepeatingXorEncodable for I {}
-	where <Self as Iterator>::Item : BitXor {
+impl<I : Iterator + Clone> RepeatingXorEncodable for I
+where <Self as Iterator>::Item : BitXor {
+	type Output = Vec<<<Self as Iterator>::Item as BitXor>::Output>;
 
-		repeating_xor_encode<u8>
+	fn repeating_xor_encode(self, rhs : Self) -> Vec<<<Self as Iterator>::Item as BitXor>::Output>{
+		let mut return_vec = Vec::new();
+		let mut rhs_cycle = rhs.cycle();
+		for item in self {
+			return_vec.push(item ^ rhs_cycle.next().unwrap()); // TODO: use patterns for this
+		}
+
+		return return_vec;
 	}
 }
 
