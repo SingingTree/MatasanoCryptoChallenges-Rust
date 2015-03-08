@@ -25,5 +25,15 @@ where <Self as Iterator>::Item : BitXor {
 
 #[cfg(test)]
 mod tests {
+	use repeating_xor::RepeatingXorEncodable;
 
+	#[test]
+	fn test_array_u8_repeating_xor() {
+		let plaintext_vec = [0x00, 0xAA, 0xAA, 0x00];
+		let key = [0x00, 0xAA];
+		let mut expected_output = Vec::new(); 
+		expected_output.push(0x00); expected_output.push(0x00); expected_output.push(0xAA); expected_output.push(0xAA);
+
+		assert_eq!(plaintext_vec.iter().repeating_xor_encode(key.iter()), expected_output);
+	}
 }
