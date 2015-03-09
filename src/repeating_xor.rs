@@ -3,21 +3,23 @@ use std::ops::BitXor;
 trait RepeatingXorEncodable {
 	type Output;
 
-	fn repeating_xor_encode(self, rhs : Self) -> Self::Output;	
+	fn repeating_xor_encode(self, key : Self) -> Self::Output;	
 }
 
 impl<I : Iterator + Clone> RepeatingXorEncodable for I
 where <Self as Iterator>::Item : BitXor {
-	type Output = Vec<<<Self as Iterator>::Item as BitXor>::Output>;
+	type Output = Result<Vec<<<Self as Iterator>::Item as BitXor>::Output>, &'static str>;
 
-	fn repeating_xor_encode(self, rhs : Self) -> Vec<<<Self as Iterator>::Item as BitXor>::Output>{
+	fn repeating_xor_encode(self, key : Self) -> Result<Vec<<<Self as Iterator>::Item as BitXor>::Output>, &'static str>{
 		let mut return_vec = Vec::new();
-		let mut rhs_cycle = rhs.cycle();
+		let mut key_cycle = key.cycle();
 		for item in self {
-			return_vec.push(item ^ rhs_cycle.next().unwrap()); // TODO: use patterns for this
+			match key_cycle.next() {
+				Some(thing) => return_vec.push(item ^ thing),
+				None => return Err("Error itering key for repeating XOR, none returned by iter where element expected")
+			}
 		}
-
-		return return_vec;
+		return Ok(return_vec);
 	}
 }
 
@@ -35,7 +37,7 @@ mod tests {
 		let mut expected_output = Vec::new(); 
 		expected_output.push(0x00); expected_output.push(0x00); expected_output.push(0xAA); expected_output.push(0xAA);
 
-		assert_eq!(plaintext_array.iter().repeating_xor_encode(key.iter()), expected_output);
+		assert_eq!(plaintext_array.iter().repeating_xor_encode(key.iter()).unwrap(), expected_output);
 	}
 
 	#[test]
@@ -44,6 +46,6 @@ mod tests {
 		let key = "ICE";
 		let expected_output = "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f".from_hex().unwrap();
 
-		assert_eq!(plaintext_string.as_bytes().iter().repeating_xor_encode(key.as_bytes().iter()), expected_output);
+		assert_eq!(plaintext_string.as_bytes().iter().repeating_xor_encode(key.as_bytes().iter()).unwrap(), expected_output);
 	}
 }
