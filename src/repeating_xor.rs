@@ -1,4 +1,5 @@
 use std::ops::BitXor;
+use std::collections::btree_map::BTreeMap;
 
 trait RepeatingXorEncodable {
 	type Output;
@@ -23,7 +24,11 @@ where <Self as Iterator>::Item : BitXor {
 	}
 }
 
-
+fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BTreeMap<char, f32>) {
+	for possible_key_len in range(1, 20) {
+		// Break input bytes into chunks of possible_key_len, analyse those using single byte xor freq attack
+	}
+}
 
 #[cfg(test)]
 mod tests {

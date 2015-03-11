@@ -3,7 +3,7 @@ use std::collections::btree_map::BTreeMap;
 use frequency_analysis::{self, FrequencyAnalysable};
 //use std::ascii::AsciiExt;
 
-pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BTreeMap<char, f32>) {
+pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BTreeMap<char, f32>) -> Vec<(String, f32)> {
 	let byte_freqs = bytes.frequencies();
 	let mut bytes_by_freq : Vec<(&u8, f32)> = byte_freqs.into_iter().collect();
 	bytes_by_freq.sort_by(|&(_, a), &(_, b )| if a > b {Ordering::Less} else {Ordering::Greater});
@@ -30,11 +30,12 @@ pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BT
 	// 		Ordering::Greater
 	// 	});
 
-	for &(ref k, f) in possible_decodes.iter().take(10) {
-		//let f : () = k;
-		println!("{}: {:?}", f, k);
-	}
+	// for &(ref k, f) in possible_decodes.iter().take(10) {
+	// 	//let f : () = k;
+	// 	println!("{}: {:?}", f, k);
+	// }
 
+	return possible_decodes;
 }
 
 #[cfg(test)]
