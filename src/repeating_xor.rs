@@ -25,8 +25,17 @@ where <Self as Iterator>::Item : BitXor {
 }
 
 fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BTreeMap<char, f32>) {
+	//let decode_candidates_by_key_len : Vec<
 	for possible_key_len in range(1, 20) {
-		// Break input bytes into chunks of possible_key_len, analyse those using single byte xor freq attack
+		let mut bit_strings_to_decode : Vec<Vec<u8>> = Vec::new();
+		for i in range(0, possible_key_len) {
+			bit_strings_to_decode.push(Vec::new());
+		}
+
+		for (i, byte) in bytes.iter().enumerate() {
+			bit_strings_to_decode[i % possible_key_len].push(*byte);
+		}
+		
 	}
 }
 
