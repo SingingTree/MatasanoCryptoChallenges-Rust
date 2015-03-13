@@ -1,5 +1,6 @@
 use std::ops::BitXor;
 use std::collections::btree_map::BTreeMap;
+use single_byte_xor;
 
 trait RepeatingXorEncodable {
 	type Output;
@@ -26,7 +27,8 @@ where <Self as Iterator>::Item : BitXor {
 
 fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BTreeMap<char, f32>) {
 	//let decode_candidates_by_key_len : Vec<
-	for possible_key_len in range(1, 20) {
+	//for possible_key_len in range(1, 20) {
+	for possible_key_len in range(1, 2) { // For testing purposes
 		let mut bit_strings_to_decode : Vec<Vec<u8>> = Vec::new();
 		for i in range(0, possible_key_len) {
 			bit_strings_to_decode.push(Vec::new());
@@ -35,7 +37,17 @@ fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BTreeM
 		for (i, byte) in bytes.iter().enumerate() {
 			bit_strings_to_decode[i % possible_key_len].push(*byte);
 		}
+
+		let mut decoded_strings : Vec<String> = Vec::new();
+		for bit_string in bit_strings_to_decode {
+			decoded_strings.push(single_byte_xor::find_textual_decode_candidates(bit_string.as_slice(), character_frequencies).remove(0).0);
+		}
 		
+		let mut decode_candidate_for_key_len = String::new();
+
+		// for i in range(0, bytes.len()) { // Need to figure out how to constitute the final string in a rusty way
+		// 	decoded_strings[i % possible_key_len]
+		// }
 	}
 }
 
