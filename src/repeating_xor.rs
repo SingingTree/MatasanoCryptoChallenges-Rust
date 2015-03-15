@@ -1,6 +1,7 @@
 use std::ops::BitXor;
 use std::collections::btree_map::BTreeMap;
 use std::str::Chars;
+use std::borrow::BorrowMut;
 use single_byte_xor;
 
 trait RepeatingXorEncodable {
@@ -26,7 +27,7 @@ where <Self as Iterator>::Item : BitXor {
 	}
 }
 
-fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BTreeMap<char, f32>) {
+pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BTreeMap<char, f32>) {
 	//let decode_candidates_by_key_len : Vec<
 	//for possible_key_len in range(1, 20) {
 	for possible_key_len in range(1, 2) { // For testing purposes
@@ -40,22 +41,31 @@ fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BTreeM
 		}
 
 		let mut decoded_strings : Vec<String> = Vec::new();
-		for bit_string in bit_strings_to_decode {
+		for bit_string in &bit_strings_to_decode {
 			decoded_strings.push(single_byte_xor::find_textual_decode_candidates(bit_string.as_slice(), character_frequencies).remove(0).0);
 		}
 		
-		let decoded_string_chars : Vec<Chars> = decoded_strings.iter().map(|x| x.chars()).collect();
+		let mut decoded_string_chars : Vec<Chars> = decoded_strings.iter().map(|x| x.chars()).collect();
 
 		let mut decode_candidate_for_key_len = String::new();
 
-		loop {
-			for mut char_iter in &decoded_string_chars {
-				match char_iter.next() { // All broken here
-					None => break,
-					Some(c) => decode_candidate_for_key_len.push(c)
-				}
-			}
+		for s in &decoded_strings {
+			println!("{}", s);
 		}
+
+		// for c in &decoded_string_chars[0] {
+		// 	println!("{}", c);
+		// }
+
+		// loop {
+		// 	for char_iter in decoded_string_chars.borrow_mut() {
+		// 		let charOption : Option<char> = char_iter.next();
+		// 		match charOption  { // All broken here
+		// 			None => break,
+		// 			Some(c) => decode_candidate_for_key_len.push(c)
+		// 		}
+		// 	}
+		// }
 	}
 }
 
