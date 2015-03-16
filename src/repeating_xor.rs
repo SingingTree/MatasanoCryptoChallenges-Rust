@@ -68,14 +68,15 @@ pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BT
 		// 	println!("{}", c);
 		// }
 
-		//loop {
-			for mut char_iter in decoded_string_chars.iter_mut().cycle() {
+		let mut creating_decode_candidate = true;
+		while creating_decode_candidate {
+			for mut char_iter in decoded_string_chars.iter_mut() {
 				match char_iter.next()  { // All broken here
-					None => break,
+					None => creating_decode_candidate = false,
 					Some(c) => decode_candidate_for_key_len.push(c)
 				}
 			}
-		//}
+		}
 	}
 }
 
