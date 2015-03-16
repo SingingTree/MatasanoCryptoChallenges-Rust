@@ -49,23 +49,33 @@ pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BT
 
 		let mut decode_candidate_for_key_len = String::new();
 
-		for s in &decoded_strings {
-			println!("{}", s);
-		}
+		// for s in &decoded_strings {
+		// 	println!("{}", s);
+		// }
+
+		// for mut chars in decoded_string_chars {
+		// 	loop {
+		// 		match chars.next() {
+		// 			None => break,
+		// 			Some(c) => print!("{}", c)
+		// 		}
+		// 	}
+				
+		// 	println!("");
+		// }
 
 		// for c in &decoded_string_chars[0] {
 		// 	println!("{}", c);
 		// }
 
-		// loop {
-		// 	for char_iter in decoded_string_chars.borrow_mut() {
-		// 		let charOption : Option<char> = char_iter.next();
-		// 		match charOption  { // All broken here
-		// 			None => break,
-		// 			Some(c) => decode_candidate_for_key_len.push(c)
-		// 		}
-		// 	}
-		// }
+		//loop {
+			for mut char_iter in decoded_string_chars.iter_mut().cycle() {
+				match char_iter.next()  { // All broken here
+					None => break,
+					Some(c) => decode_candidate_for_key_len.push(c)
+				}
+			}
+		//}
 	}
 }
 
