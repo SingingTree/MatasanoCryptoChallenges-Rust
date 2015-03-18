@@ -41,12 +41,20 @@ pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BT
 #[cfg(test)]
 mod tests {
 	use rustc_serialize::hex::FromHex;
-	use frequency_analysis::FrequencyAnalysable;
+	use frequency_analysis::{self, FrequencyAnalysable};
+	use single_byte_xor::find_textual_decode_candidates;
 
 	#[test]
 	fn frequencies_of_buffer() {
 		let hex_buffer = "1c1c1c".from_hex().unwrap();
 		let freqs = hex_buffer.frequencies();
 		assert!(freqs.get(&0x1c) > Some(&0.99) && freqs.get(&5) < Some(&1.01));
+	}
+
+	#[test]
+	fn matasano_decrypt() {
+		let hex_bytes = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736".from_hex().unwrap();
+		let mut decode_candidates = find_textual_decode_candidates(hex_bytes.as_slice(), &frequency_analysis::english_letter_frequencies());
+		assert_eq!(decode_candidates.remove(0).0, "Cooking MC's like a pound of bacon");
 	}
 }
