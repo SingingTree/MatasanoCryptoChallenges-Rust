@@ -29,6 +29,7 @@ mod tests {
 		let num2 : f32 = 0.0010000000001;
 
 		assert!(num1.approx_equal(num2));
+		assert!(num2.approx_equal(num1));
 	}
 
 	#[test]
@@ -37,5 +38,6 @@ mod tests {
 		let num2 : f32 = 0.00101;
 
 		assert!(!num1.approx_equal(num2));
+		assert!(!num2.approx_equal(num1));
 	}
 }
