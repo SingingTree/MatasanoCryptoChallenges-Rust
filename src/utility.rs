@@ -7,14 +7,14 @@ pub trait ApproxEquality<T> {
 impl ApproxEquality<f32> for f32 {
 	fn approx_equal(self, other : f32) -> bool {
 		let epsilon : f32 = 0.000000001;
-		return self - other < epsilon;
+		return (self - other).abs() < epsilon;
 	}
 }
 
 impl ApproxEquality<f64> for f64 {
 	fn approx_equal(self, other : f64) -> bool {
 		let epsilon : f64 = 0.000000001;
-		return self - other < epsilon;
+		return (self - other).abs() < epsilon;
 	}
 }
 
@@ -29,7 +29,6 @@ mod tests {
 		let num2 : f32 = 0.0010000000001;
 
 		assert!(num1.approx_equal(num2));
-
 	}
 
 	#[test]
