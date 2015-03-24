@@ -1,7 +1,6 @@
 use std::ops::BitXor;
 use std::collections::btree_map::BTreeMap;
 use std::str::Chars;
-use std::borrow::BorrowMut;
 use single_byte_xor;
 
 trait RepeatingXorEncodable {
@@ -30,9 +29,9 @@ where <Self as Iterator>::Item : BitXor {
 pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BTreeMap<char, f32>) {
 	//let decode_candidates_by_key_len : Vec<
 	//for possible_key_len in range(1, 20) {
-	for possible_key_len in range(1, 2) { // For testing purposes
+	for possible_key_len in range(1, 3) { // For testing purposes
 		let mut bit_strings_to_decode : Vec<Vec<u8>> = Vec::new();
-		for i in range(0, possible_key_len) {
+		for _i in range(0, possible_key_len) {
 			bit_strings_to_decode.push(Vec::new());
 		}
 
@@ -77,6 +76,8 @@ pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BT
 				}
 			}
 		}
+
+		println!("{}", decode_candidate_for_key_len);
 	}
 }
 
