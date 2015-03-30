@@ -178,4 +178,11 @@ mod tests {
         let ratio = frequency_analysis::alphabetic_uppercase_frequency(word.chars());
         assert!(ratio > 0.19 && ratio < 0.21);
     }
+
+    #[test]
+    fn control_character_frequency_test() {
+        let word = "Hello\t\t\n";
+        let ratio = frequency_analysis::control_character_frequency(word.chars());
+        assert!(ratio > 0.374 && ratio < 0.376);
+    }
 }
