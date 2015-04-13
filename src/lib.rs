@@ -1,8 +1,4 @@
-#![feature(collections)]
-#![feature(unicode)]
-#![feature(core)]
-
-extern crate "rustc-serialize" as rustc_serialize;
+extern crate rustc_serialize;
 
 pub mod base64;
 pub mod fixed_xor;

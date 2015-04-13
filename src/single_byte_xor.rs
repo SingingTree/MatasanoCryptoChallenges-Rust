@@ -12,7 +12,7 @@ pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BT
 
 	//Brute force for exploration
 	let mut possible_decodes : Vec<(String, f32)> = Vec::new();
-	for i in range(0, 255) {
+	for i in 0..255 {
 		let possible_decode : String = bytes.iter().map(|&b| (b ^ i) as char).collect();
 		let possible_decode_freq_difference = frequency_analysis::character_frequency_distance(possible_decode.chars(), &character_frequencies);
 		possible_decodes.push((possible_decode, possible_decode_freq_difference));
