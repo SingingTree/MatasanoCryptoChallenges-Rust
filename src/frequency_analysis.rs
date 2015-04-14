@@ -42,6 +42,18 @@ where <I as Iterator>::Item: Ord {
 	return frequencies;
 }
 
+// impl<'a> FrequencyAnalysable for &'a str {
+//    type Item = char;
+
+// 	fn occurrences(self) -> BTreeMap<char, usize> {
+// 		return occurrences_from_iter(self.chars());
+// 	}
+
+// 	fn frequencies(self) -> BTreeMap<char, f32> {
+// 		return frequencies_from_iter(self.chars());
+// 	}
+// }
+
 impl<II : IntoIterator> FrequencyAnalysable for II
 where <<Self as IntoIterator>::IntoIter as Iterator>::Item : Ord {
 	type Item = <<Self as IntoIterator>::IntoIter as Iterator>::Item;
@@ -54,18 +66,6 @@ where <<Self as IntoIterator>::IntoIter as Iterator>::Item : Ord {
 		return frequencies_from_iter(self.into_iter());
 	}
 }
-
-// impl<'a> FrequencyAnalysable for &'a str {
-//    type Item = char;
-
-// 	fn occurrences(self) -> BTreeMap<char, usize> {
-// 		return occurrences_from_iter(self.chars());
-// 	}
-
-// 	fn frequencies(self) -> BTreeMap<char, f32> {
-// 		return frequencies_from_iter(self.chars());
-// 	}
-// }
 
 pub fn character_frequency_distance(characters : Chars, character_frequencies : &BTreeMap<char, f32>) -> f32 {
 	let character_freqs = characters.frequencies();
@@ -84,7 +84,7 @@ pub fn character_frequency_distance(characters : Chars, character_frequencies : 
 	return difference_from_specified_freqs;
 }
 
-pub fn alphabetic_uppercase_frequency<I : Iterator>(characters : Chars) -> f32 {
+pub fn alphabetic_uppercase_frequency(characters : Chars) -> f32 {
 	let mut total_alphabetic : f32 = 0.0;
 	let mut uppercase_alphabetic : f32 = 0.0;
 	for c in characters {
@@ -98,7 +98,7 @@ pub fn alphabetic_uppercase_frequency<I : Iterator>(characters : Chars) -> f32 {
 	return uppercase_alphabetic / total_alphabetic;
 }
 
-pub fn control_character_frequency<I : Iterator>(characters : Chars) -> f32{
+pub fn control_character_frequency(characters : Chars) -> f32{
 	let mut total_chars : f32 = 0.0;
 	let mut total_control_chars : f32 = 0.0;
 	for c in characters {
@@ -148,14 +148,14 @@ mod tests {
 	#[test]
 	fn string_occurrence_test() {
 		let hello : &str = "Hello";
-		let occurrences = hello.occurrences();
+		let occurrences = hello.chars().occurrences();
 		assert_eq!(occurrences.get(&'l'), Some(&2));
 	}
 
 	#[test]
 	fn string_frequency_test() {
 		let hello : &str = "Hello";
-		let freqs = hello.frequencies();
+		let freqs = hello.chars().frequencies();
 		assert!(freqs.get(&'o') > Some(&0.19) && freqs.get(&'o') < Some(&0.21));
 	}
 

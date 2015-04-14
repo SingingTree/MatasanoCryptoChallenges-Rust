@@ -41,6 +41,7 @@ pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BT
 #[cfg(test)]
 mod tests {
 	use rustc_serialize::hex::FromHex;
+	use std::borrow::Borrow;
 	use frequency_analysis::{self, FrequencyAnalysable};
 	use single_byte_xor::find_textual_decode_candidates;
 
@@ -54,7 +55,7 @@ mod tests {
 	#[test]
 	fn matasano_decrypt() {
 		let hex_bytes = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736".from_hex().unwrap();
-		let mut decode_candidates = find_textual_decode_candidates(hex_bytes.as_slice(), &frequency_analysis::english_letter_frequencies());
+		let mut decode_candidates = find_textual_decode_candidates(hex_bytes.borrow(), &frequency_analysis::english_letter_frequencies());
 		assert_eq!(decode_candidates.remove(0).0, "Cooking MC's like a pound of bacon");
 	}
 }
