@@ -25,7 +25,7 @@ pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BT
 
 	// Sort by special characters
 	possible_decodes.sort_by(|&(ref d1, f1), &(ref d2, f2)|
-		if(f1.approx_equal(f2)) {
+		if f1.approx_equal(f2) {
 			if frequency_analysis::control_character_frequency(d1.chars()) < frequency_analysis::control_character_frequency(d2.chars()) {
 				Ordering::Less
 			} else if frequency_analysis::control_character_frequency(d1.chars()) > frequency_analysis::control_character_frequency(d2.chars()) {
