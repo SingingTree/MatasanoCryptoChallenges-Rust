@@ -42,18 +42,6 @@ where <I as Iterator>::Item: Ord {
 	return frequencies;
 }
 
-// impl<'a> FrequencyAnalysable for &'a str {
-//    type Item = char;
-
-// 	fn occurrences(self) -> BTreeMap<char, usize> {
-// 		return occurrences_from_iter(self.chars());
-// 	}
-
-// 	fn frequencies(self) -> BTreeMap<char, f32> {
-// 		return frequencies_from_iter(self.chars());
-// 	}
-// }
-
 impl<II : IntoIterator> FrequencyAnalysable for II
 where <<Self as IntoIterator>::IntoIter as Iterator>::Item : Ord {
 	type Item = <<Self as IntoIterator>::IntoIter as Iterator>::Item;
