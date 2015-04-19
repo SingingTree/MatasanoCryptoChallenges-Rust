@@ -57,6 +57,10 @@ pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BT
 	return possible_decodes;
 }
 
+pub fn find_encoded_candidate_from_list(&[&str]) {
+
+}
+
 #[cfg(test)]
 mod tests {
 	use rustc_serialize::hex::FromHex;
