@@ -57,8 +57,16 @@ pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BT
 	return possible_decodes;
 }
 
-pub fn find_encoded_candidate_from_list(&[&str]) {
+pub fn find_encoded_candidate_from_list(bit_strings : &[&[u8]], character_frequencies : &BTreeMap<char, f32>) -> Vec<(String, f32)> {
+	let mut best_decode_candidates : Vec<(String, f32)> = Vec::new();
+	for s in bit_strings {
+		best_decode_candidates.push(find_textual_decode_candidates(s, character_frequencies).remove(0));
+	}
 
+	// Sort by frequency
+	best_decode_candidates.sort_by(|&(_, f1), &(_, f2)| if f1 < f2 {Ordering::Less} else {Ordering::Greater});
+
+	return best_decode_candidates;
 }
 
 #[cfg(test)]
