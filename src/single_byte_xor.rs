@@ -57,13 +57,13 @@ pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BT
 	return possible_decodes;
 }
 
-pub fn find_encoded_candidate_from_list(bit_strings : &[&[u8]], character_frequencies : &BTreeMap<char, f32>) -> Vec<(String, f32)> {
+pub fn find_best_decode_candidates_for_slice(bit_strings : &[&[u8]], character_frequencies : &BTreeMap<char, f32>) -> Vec<(String, f32)> {
 	let mut best_decode_candidates : Vec<(String, f32)> = Vec::new();
 	for s in bit_strings {
 		best_decode_candidates.push(find_textual_decode_candidates(s, character_frequencies).remove(0));
 	}
 
-	// Sort by frequency
+	// Sort candidates by frequency, the one with the least distance to our ideal char freqs will be at the start of the list
 	best_decode_candidates.sort_by(|&(_, f1), &(_, f2)| if f1 < f2 {Ordering::Less} else {Ordering::Greater});
 
 	return best_decode_candidates;
@@ -74,7 +74,7 @@ mod tests {
 	use rustc_serialize::hex::FromHex;
 	use std::borrow::Borrow;
 	use frequency_analysis::{self, FrequencyAnalysable};
-	use single_byte_xor::find_textual_decode_candidates;
+	use single_byte_xor::{find_textual_decode_candidates, find_best_decode_candidates_for_slice};
 
 	#[test]
 	fn frequencies_of_buffer() {
@@ -84,9 +84,28 @@ mod tests {
 	}
 
 	#[test]
-	fn matasano_decrypt() {
+	fn matasano_find_single_byte_xor_plain_text() {
 		let hex_bytes = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736".from_hex().unwrap();
 		let mut decode_candidates = find_textual_decode_candidates(hex_bytes.borrow(), &frequency_analysis::english_letter_frequencies());
 		assert_eq!(decode_candidates.remove(0).0, "Cooking MC's like a pound of bacon");
 	}
+
+	// #[test]
+	// fn find_single_byte_xor_in_list_of_candidates() {
+	// 	let text_bytes = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736".from_hex().unwrap(); // Encoded "Cooking MC's like a pound of bacon"
+	// 	let random_bytes_1 = "04050b447efd1efc28004ce63e85adb40c61d2cc3bf1d3a39c79f1091a3e96b810be".from_hex().unwrap();
+	// 	let random_bytes_2 = "f4930be3b09a0fd724ad4e1843e27494289c8b793e4bee12722fef52344aba8fe13e".from_hex().unwrap();
+	// 	let random_bytes_3 = "5cc78e04ab8ed6d9bce1d2d971b055e387b5b3414dc165e3f75b3cd957bc34a772d0".from_hex().unwrap();
+
+	// 	let mut encoded_slices : Vec<[&u8]> = Vec::new();
+	// 	encoded_slices.push(text_bytes);
+	// 	encoded_slices.push(random_bytes_1);
+	// 	encoded_slices.push(random_bytes_2);
+	// 	encoded_slices.push(random_bytes_3);
+
+	// 	let decode_candidates = find_best_decode_candidates_for_slice(encoded_slices, &frequency_analysis::english_letter_frequencies());
+
+	// 	assert_eq!(decode_candidates.remove(0).0, "Cooking MC's like a pound of bacon");
+	// }
 }
+
