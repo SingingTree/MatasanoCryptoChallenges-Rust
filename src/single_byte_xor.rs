@@ -90,22 +90,19 @@ mod tests {
 		assert_eq!(decode_candidates.remove(0).0, "Cooking MC's like a pound of bacon");
 	}
 
-	// #[test]
-	// fn find_single_byte_xor_in_list_of_candidates() {
-	// 	let text_bytes = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736".from_hex().unwrap(); // Encoded "Cooking MC's like a pound of bacon"
-	// 	let random_bytes_1 = "04050b447efd1efc28004ce63e85adb40c61d2cc3bf1d3a39c79f1091a3e96b810be".from_hex().unwrap();
-	// 	let random_bytes_2 = "f4930be3b09a0fd724ad4e1843e27494289c8b793e4bee12722fef52344aba8fe13e".from_hex().unwrap();
-	// 	let random_bytes_3 = "5cc78e04ab8ed6d9bce1d2d971b055e387b5b3414dc165e3f75b3cd957bc34a772d0".from_hex().unwrap();
+	#[test]
+	fn find_single_byte_xor_in_list_of_candidates() {
+		let text_bytes = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736".from_hex().unwrap(); // Encoded "Cooking MC's like a pound of bacon"
+		let random_bytes_1 = "04050b447efd1efc28004ce63e85adb40c61d2cc3bf1d3a39c79f1091a3e96b810be".from_hex().unwrap();
+		let random_bytes_2 = "f4930be3b09a0fd724ad4e1843e27494289c8b793e4bee12722fef52344aba8fe13e".from_hex().unwrap();
+		let random_bytes_3 = "5cc78e04ab8ed6d9bce1d2d971b055e387b5b3414dc165e3f75b3cd957bc34a772d0".from_hex().unwrap();
 
-	// 	let mut encoded_slices : Vec<[&u8]> = Vec::new();
-	// 	encoded_slices.push(text_bytes);
-	// 	encoded_slices.push(random_bytes_1);
-	// 	encoded_slices.push(random_bytes_2);
-	// 	encoded_slices.push(random_bytes_3);
+		let mut encoded_slices : [&[u8]; 4] = [text_bytes.borrow(), random_bytes_1.borrow(), random_bytes_2.borrow(), random_bytes_3.borrow()];
+		
 
-	// 	let decode_candidates = find_best_decode_candidates_for_slice(encoded_slices, &frequency_analysis::english_letter_frequencies());
+		let mut decode_candidates = find_best_decode_candidates_for_slice(encoded_slices.borrow(), &frequency_analysis::english_letter_frequencies());
 
-	// 	assert_eq!(decode_candidates.remove(0).0, "Cooking MC's like a pound of bacon");
-	// }
+		assert_eq!(decode_candidates.remove(0).0, "Cooking MC's like a pound of bacon");
+	}
 }
 
