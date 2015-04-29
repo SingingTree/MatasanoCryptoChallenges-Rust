@@ -2,7 +2,7 @@ use std::ops::BitXor;
 use std::collections::btree_map::BTreeMap;
 use std::str::Chars;
 use std::borrow::Borrow;
-use single_byte_xor;
+use single_byte_xor::SingleByteXorDecodable;
 
 trait RepeatingXorEncodable {
 	type Output;
@@ -42,7 +42,7 @@ pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BT
 
 		let mut decoded_strings : Vec<String> = Vec::new();
 		for bit_string in &bit_strings_to_decode {
-			decoded_strings.push(single_byte_xor::find_textual_decode_candidates(bit_string.borrow(), character_frequencies).remove(0).0);
+			decoded_strings.push(bit_string.borrow().find_textual_decode_candidates(character_frequencies).remove(0).0);
 		}
 		
 		let mut decoded_string_chars : Vec<Chars> = decoded_strings.iter().map(|x| x.chars()).collect();
