@@ -5,11 +5,11 @@ use utility::ApproxEquality;
 
 pub trait SingleByteXorDecodable {
 	// Find all possible decode candidates for the input and return a list vector of tuples - a decode candidate and the frequency of it occurring
-	fn find_textual_decode_candidates(&self, character_frequencies : &BTreeMap<char, f32>) -> Vec<(String, f32)>;
+	fn find_single_byte_xor_textual_decode_candidates(&self, character_frequencies : &BTreeMap<char, f32>) -> Vec<(String, f32)>;
 }
 
 impl SingleByteXorDecodable for [u8] {
-fn find_textual_decode_candidates(&self, character_frequencies : &BTreeMap<char, f32>) -> Vec<(String, f32)> {
+fn find_single_byte_xor_textual_decode_candidates(&self, character_frequencies : &BTreeMap<char, f32>) -> Vec<(String, f32)> {
 	let byte_freqs = self.frequencies();
 	let mut bytes_by_freq : Vec<(&u8, f32)> = byte_freqs.into_iter().collect();
 	bytes_by_freq.sort_by(|&(_, a), &(_, b )| if a > b {Ordering::Less} else {Ordering::Greater});
@@ -65,7 +65,7 @@ fn find_textual_decode_candidates(&self, character_frequencies : &BTreeMap<char,
 pub fn find_best_decode_candidates_for_slice(bit_strings : &[&[u8]], character_frequencies : &BTreeMap<char, f32>) -> Vec<(String, f32)> {
 	let mut best_decode_candidates : Vec<(String, f32)> = Vec::new();
 	for s in bit_strings {
-		best_decode_candidates.push(s.find_textual_decode_candidates(character_frequencies).remove(0));
+		best_decode_candidates.push(s.find_single_byte_xor_textual_decode_candidates(character_frequencies).remove(0));
 	}
 
 	// Sort candidates by frequency, the one with the least distance to our ideal char freqs will be at the start of the list
@@ -91,7 +91,7 @@ mod tests {
 	#[test]
 	fn matasano_find_single_byte_xor_plain_text() {
 		let hex_bytes = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736".from_hex().unwrap();
-		let mut decode_candidates = hex_bytes.borrow().find_textual_decode_candidates(&frequency_analysis::english_letter_frequencies());
+		let mut decode_candidates = hex_bytes.borrow().find_single_byte_xor_textual_decode_candidates(&frequency_analysis::english_letter_frequencies());
 		assert_eq!(decode_candidates.remove(0).0, "Cooking MC's like a pound of bacon");
 	}
 

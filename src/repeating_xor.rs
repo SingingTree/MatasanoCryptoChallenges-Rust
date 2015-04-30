@@ -27,7 +27,7 @@ where <Self as Iterator>::Item : BitXor {
 	}
 }
 
-pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BTreeMap<char, f32>) {
+pub fn find_repeating_xor_textual_decode_candidates(bytes : &[u8], character_frequencies : &BTreeMap<char, f32>) {
 	//let decode_candidates_by_key_len : Vec<
 	//for possible_key_len in 1..20 {
 	for possible_key_len in 1..3 { // For testing purposes
@@ -42,7 +42,7 @@ pub fn find_textual_decode_candidates(bytes : &[u8], character_frequencies : &BT
 
 		let mut decoded_strings : Vec<String> = Vec::new();
 		for bit_string in &bit_strings_to_decode {
-			decoded_strings.push(bit_string.borrow().find_textual_decode_candidates(character_frequencies).remove(0).0);
+			decoded_strings.push(bit_string.borrow().find_single_byte_xor_textual_decode_candidates(character_frequencies).remove(0).0);
 		}
 		
 		let mut decoded_string_chars : Vec<Chars> = decoded_strings.iter().map(|x| x.chars()).collect();
