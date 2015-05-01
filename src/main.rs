@@ -13,7 +13,7 @@ fn main() {
 	//let hex_bytes = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736".from_hex().unwrap();
 	//repeating_xor::find_textual_decode_candidates(hex_bytes.borrow(), &frequency_analysis::english_letter_frequencies());
 
-	let list_with_one_encoded_string : Vec<u8> =
+	let list_with_one_encoded_string : Vec<Vec<u8>> =
 	"0e3647e8592d35514a081243582536ed3de6734059001e3f535ce6271032\
 	334b041de124f73c18011a50e608097ac308ecee501337ec3e100854201d\
 	40e127f51c10031d0133590b1e490f3514e05a54143d08222c2a4071e351\

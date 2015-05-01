@@ -42,7 +42,8 @@ pub fn find_repeating_xor_textual_decode_candidates(bytes : &[u8], character_fre
 
 		let mut decoded_strings : Vec<String> = Vec::new();
 		for bit_string in &bit_strings_to_decode {
-			decoded_strings.push(bit_string.borrow().find_single_byte_xor_textual_decode_candidates(character_frequencies).remove(0).0);
+			let bit_string_borrow : &[u8] = bit_string.borrow();
+			decoded_strings.push(bit_string_borrow.find_single_byte_xor_textual_decode_candidates(character_frequencies).remove(0).0);
 		}
 		
 		let mut decoded_string_chars : Vec<Chars> = decoded_strings.iter().map(|x| x.chars()).collect();
