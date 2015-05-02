@@ -10,6 +10,10 @@ trait RepeatingXorEncodable {
 	fn repeating_xor_encode(self, key : Self) -> Self::Output;	
 }
 
+trait RepeadtingXorDecodable {
+	fn find_repeating_xor_textual_decode_candidates(&self, character_frequencies : &BTreeMap<char, f32>);
+}
+
 impl<I : Iterator + Clone> RepeatingXorEncodable for I
 where <Self as Iterator>::Item : BitXor {
 	type Output = Result<Vec<<<Self as Iterator>::Item as BitXor>::Output>, &'static str>;
@@ -26,60 +30,61 @@ where <Self as Iterator>::Item : BitXor {
 		return Ok(return_vec);
 	}
 }
+impl RepeadtingXorDecodable for [u8] {
+	fn find_repeating_xor_textual_decode_candidates(&self, character_frequencies : &BTreeMap<char, f32>) {
+		//let decode_candidates_by_key_len : Vec<
+		//for possible_key_len in 1..20 {
+		for possible_key_len in 1..3 { // For testing purposes
+			let mut bit_strings_to_decode : Vec<Vec<u8>> = Vec::new();
+			for _i in 0..possible_key_len {
+				bit_strings_to_decode.push(Vec::new());
+			}
 
-pub fn find_repeating_xor_textual_decode_candidates(bytes : &[u8], character_frequencies : &BTreeMap<char, f32>) {
-	//let decode_candidates_by_key_len : Vec<
-	//for possible_key_len in 1..20 {
-	for possible_key_len in 1..3 { // For testing purposes
-		let mut bit_strings_to_decode : Vec<Vec<u8>> = Vec::new();
-		for _i in 0..possible_key_len {
-			bit_strings_to_decode.push(Vec::new());
-		}
+			for (i, byte) in self.iter().enumerate() {
+				bit_strings_to_decode[i % possible_key_len].push(*byte);
+			}
 
-		for (i, byte) in bytes.iter().enumerate() {
-			bit_strings_to_decode[i % possible_key_len].push(*byte);
-		}
+			let mut decoded_strings : Vec<String> = Vec::new();
+			for bit_string in &bit_strings_to_decode {
+				let bit_string_borrow : &[u8] = bit_string.borrow();
+				decoded_strings.push(bit_string_borrow.find_single_byte_xor_textual_decode_candidates(character_frequencies).remove(0).0);
+			}
+			
+			let mut decoded_string_chars : Vec<Chars> = decoded_strings.iter().map(|x| x.chars()).collect();
 
-		let mut decoded_strings : Vec<String> = Vec::new();
-		for bit_string in &bit_strings_to_decode {
-			let bit_string_borrow : &[u8] = bit_string.borrow();
-			decoded_strings.push(bit_string_borrow.find_single_byte_xor_textual_decode_candidates(character_frequencies).remove(0).0);
-		}
-		
-		let mut decoded_string_chars : Vec<Chars> = decoded_strings.iter().map(|x| x.chars()).collect();
+			let mut decode_candidate_for_key_len = String::new();
 
-		let mut decode_candidate_for_key_len = String::new();
+			// for s in &decoded_strings {
+			// 	println!("{}", s);
+			// }
 
-		// for s in &decoded_strings {
-		// 	println!("{}", s);
-		// }
+			// for mut chars in decoded_string_chars {
+			// 	loop {
+			// 		match chars.next() {
+			// 			None => break,
+			// 			Some(c) => print!("{}", c)
+			// 		}
+			// 	}
+					
+			// 	println!("");
+			// }
 
-		// for mut chars in decoded_string_chars {
-		// 	loop {
-		// 		match chars.next() {
-		// 			None => break,
-		// 			Some(c) => print!("{}", c)
-		// 		}
-		// 	}
-				
-		// 	println!("");
-		// }
+			// for c in &decoded_string_chars[0] {
+			// 	println!("{}", c);
+			// }
 
-		// for c in &decoded_string_chars[0] {
-		// 	println!("{}", c);
-		// }
-
-		let mut creating_decode_candidate = true;
-		while creating_decode_candidate {
-			for mut char_iter in decoded_string_chars.iter_mut() {
-				match char_iter.next()  { // All broken here
-					None => creating_decode_candidate = false,
-					Some(c) => decode_candidate_for_key_len.push(c)
+			let mut creating_decode_candidate = true;
+			while creating_decode_candidate {
+				for mut char_iter in decoded_string_chars.iter_mut() {
+					match char_iter.next()  { // All broken here
+						None => creating_decode_candidate = false,
+						Some(c) => decode_candidate_for_key_len.push(c)
+					}
 				}
 			}
-		}
 
-		println!("{}", decode_candidate_for_key_len);
+			println!("{}", decode_candidate_for_key_len);
+		}
 	}
 }
 
