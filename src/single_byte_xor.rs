@@ -1,5 +1,6 @@
 use std::cmp::Ordering;
 use std::collections::btree_map::BTreeMap;
+use std::borrow::Borrow;
 use frequency_analysis::{self, FrequencyAnalysable};
 use utility::ApproxEquality;
 
@@ -59,6 +60,13 @@ impl SingleByteXorDecodable for [u8] {
 	// }
 
 		return possible_decodes;
+	}
+}
+
+impl SingleByteXorDecodable for Vec<u8> {
+	fn find_single_byte_xor_textual_decode_candidates(&self, character_frequencies : &BTreeMap<char, f32>) -> Vec<(String, f32)> {
+		let borrowed_slice : &[u8] = self.borrow();
+		return borrowed_slice.find_single_byte_xor_textual_decode_candidates(character_frequencies);
 	}
 }
 
