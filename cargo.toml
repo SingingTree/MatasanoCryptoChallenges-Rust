@@ -6,3 +6,4 @@ authors = ["SingingTree"]
 
 [dependencies]
 rustc-serialize = "*"
+unify = "0.0.3"

@@ -1,4 +1,5 @@
 extern crate rustc_serialize;
+extern crate unify;
 
 pub mod base64;
 pub mod fixed_xor;
@@ -7,7 +8,6 @@ pub mod single_byte_xor;
 pub mod repeating_xor;
 pub mod utility;
 use rustc_serialize::hex::FromHex;
-use std::borrow::Borrow;
 
 fn main() {
 	//let hex_bytes = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736".from_hex().unwrap();
