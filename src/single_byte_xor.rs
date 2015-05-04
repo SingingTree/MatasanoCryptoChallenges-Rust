@@ -82,7 +82,7 @@ pub fn find_best_decode_candidates_for_slice(bit_strings : &[&[u8]], character_f
 	return best_decode_candidates;
 }
 
-pub fn find_best_decode_candidates_for_vec(bit_strings : Vec<Vec<u8>>, character_frequencies : &BTreeMap<char, f32>) -> Vec<(String, f32)> {
+pub fn find_best_decode_candidates_for_vec(bit_strings : &Vec<Vec<u8>>, character_frequencies : &BTreeMap<char, f32>) -> Vec<(String, f32)> {
 	let mut best_decode_candidates : Vec<(String, f32)> = Vec::new();
 	for s in bit_strings {
 		best_decode_candidates.push(s.find_single_byte_xor_textual_decode_candidates(character_frequencies).remove(0));

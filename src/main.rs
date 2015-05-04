@@ -342,5 +342,5 @@ fn main() {
 	4c071a57e9356ee415103c5c53e254063f2019340969e30a2e381d5b2555\
 	32042f46431d2c44607934ed180c1028136a5f2b26092e3b2c4e2930585a".split('\n').map(|x| x.from_hex().unwrap()).collect();
 
-	//println!("{}", single_byte_xor::find_best_decode_candidates_for_slice(list_with_one_encoded_string.borrow(), &frequency_analysis::english_letter_frequencies()));
+	println!("{}", single_byte_xor::find_best_decode_candidates_for_vec(&list_with_one_encoded_string, &frequency_analysis::english_letter_frequencies()).remove(0).0);
 }
