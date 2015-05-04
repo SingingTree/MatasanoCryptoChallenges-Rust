@@ -82,6 +82,18 @@ pub fn find_best_decode_candidates_for_slice(bit_strings : &[&[u8]], character_f
 	return best_decode_candidates;
 }
 
+pub fn find_best_decode_candidates_for_vec(bit_strings : Vec<Vec<u8>>, character_frequencies : &BTreeMap<char, f32>) -> Vec<(String, f32)> {
+	let mut best_decode_candidates : Vec<(String, f32)> = Vec::new();
+	for s in bit_strings {
+		best_decode_candidates.push(s.find_single_byte_xor_textual_decode_candidates(character_frequencies).remove(0));
+	}
+
+	// Sort candidates by frequency, the one with the least distance to our ideal char freqs will be at the start of the list
+	best_decode_candidates.sort_by(|&(_, f1), &(_, f2)| if f1 < f2 {Ordering::Less} else {Ordering::Greater});
+
+	return best_decode_candidates;
+}
+
 #[cfg(test)]
 mod tests {
 	use rustc_serialize::hex::FromHex;

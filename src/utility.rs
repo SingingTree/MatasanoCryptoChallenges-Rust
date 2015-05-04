@@ -18,7 +18,6 @@ impl ApproxEquality<f64> for f64 {
 	}
 }
 
-
 #[cfg(test)]
 mod tests {
 	use utility::ApproxEquality;
