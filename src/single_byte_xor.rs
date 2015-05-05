@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 use std::collections::btree_map::BTreeMap;
 use std::iter::IntoIterator;
 use std::ops::BitXor;
-use frequency_analysis::{self, FrequencyAnalysable};
+use frequency_analysis;
 use utility::ApproxEquality;
 
 pub trait SingleByteXorDecodable {
@@ -13,7 +13,7 @@ pub trait SingleByteXorDecodable {
 }
 
 impl<'a, II> SingleByteXorDecodable for II 
-where II: IntoIterator<Item = &'a u8>, II::IntoIter : Clone {
+    where II: IntoIterator<Item = &'a u8>, II::IntoIter : Clone {
     fn find_single_byte_xor_textual_decode_candidates(self, 
                                                       character_frequencies : &BTreeMap<char, f32>)
                                                       -> Vec<(String, f32)> {

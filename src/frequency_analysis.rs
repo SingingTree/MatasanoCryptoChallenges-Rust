@@ -1,6 +1,6 @@
 use std::collections::btree_map::{BTreeMap, Entry};
 use std::iter::IntoIterator;
-use std::num::Float;
+use num::traits::Float;
 use std::str::Chars;
 
 pub trait FrequencyAnalysable {
@@ -13,7 +13,7 @@ pub trait FrequencyAnalysable {
 }
 
 fn occurrences_from_iter<I : Iterator>(iter : I) -> BTreeMap<<I as Iterator>::Item, usize>
-where <I as Iterator>::Item: Ord {
+	where <I as Iterator>::Item: Ord {
 	let mut occurrences = BTreeMap::new();
 	for item in iter {
 		match occurrences.entry(item) {
@@ -25,7 +25,7 @@ where <I as Iterator>::Item: Ord {
 }
 
 fn frequencies_from_iter<I : Iterator>(iter : I) -> BTreeMap<<I as Iterator>::Item, f32>
-where <I as Iterator>::Item: Ord {
+	where <I as Iterator>::Item: Ord {
 	let mut occurrences = BTreeMap::new();
 	let mut i = 0;
 	for item in iter {
@@ -43,7 +43,7 @@ where <I as Iterator>::Item: Ord {
 }
 
 impl<II : IntoIterator> FrequencyAnalysable for II
-where <<Self as IntoIterator>::IntoIter as Iterator>::Item : Ord {
+	where <<Self as IntoIterator>::IntoIter as Iterator>::Item : Ord {
 	type Item = <<Self as IntoIterator>::IntoIter as Iterator>::Item;
 
 	fn occurrences(self) -> BTreeMap<<II as FrequencyAnalysable>::Item, usize> {

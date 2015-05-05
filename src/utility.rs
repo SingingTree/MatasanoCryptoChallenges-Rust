@@ -1,4 +1,4 @@
-use std::num::Float;
+use num::traits::Float;
 
 pub trait ApproxEquality<T> {
     fn approx_equal(self, other: T) -> bool;

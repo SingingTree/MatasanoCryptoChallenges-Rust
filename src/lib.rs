@@ -1,5 +1,5 @@
 extern crate rustc_serialize;
-extern crate unify;
+extern crate num;
 
 pub mod base64;
 pub mod fixed_xor;
