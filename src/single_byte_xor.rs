@@ -1,64 +1,23 @@
-use std::cmp::Ordering;
 use std::collections::btree_map::BTreeMap;
 use std::iter::IntoIterator;
 use std::ops::BitXor;
-use frequency_analysis;
-use utility::ApproxEquality;
+use utility;
 
 pub trait SingleByteXorDecodable {
-    // Find all possible decode candidates for the input and return a list vector of tuples - a decode candidate and the frequency of it occurring
-    fn find_single_byte_xor_textual_decode_candidates(self, 
-                                                      character_frequencies : &BTreeMap<char, f32>)
-                                                      -> Vec<(String, f32)>;
+    // Find all possible decode candidates for the input and return a vector containing them
+    fn find_all_single_byte_xor_decode_candidates(self) -> Vec<String>;
 }
 
 impl<'a, II> SingleByteXorDecodable for II 
     where II: IntoIterator<Item = &'a u8>, II::IntoIter : Clone {
-    fn find_single_byte_xor_textual_decode_candidates(self, 
-                                                      character_frequencies : &BTreeMap<char, f32>)
-                                                      -> Vec<(String, f32)> {
+    fn find_all_single_byte_xor_decode_candidates(self) -> Vec<String> {
         //Brute force exploration of frequencies
-        let mut possible_decodes : Vec<(String, f32)> = Vec::new();
+        let mut possible_decodes : Vec<String> = Vec::new();
         let bytes_iter = self.into_iter();
         for i in 0..255 {
             let possible_decode : String = bytes_iter.clone().map(|b| b.bitxor(i) as char).collect();
-            let possible_decode_freq_difference = frequency_analysis::character_frequency_distance(possible_decode.chars(), &character_frequencies);
-            possible_decodes.push((possible_decode, possible_decode_freq_difference));
+            possible_decodes.push(possible_decode);
         }
-
-        // Sort by frequency
-        possible_decodes.sort_by(|&(_, f1), &(_, f2)| if f1 < f2 {Ordering::Less} else {Ordering::Greater});
-
-        // Sort by special characters
-        possible_decodes.sort_by(|&(ref d1, f1), &(ref d2, f2)|
-        if f1.approx_equal(f2) {
-            if frequency_analysis::control_character_frequency(d1.chars()) < frequency_analysis::control_character_frequency(d2.chars()) {
-                Ordering::Less
-            } else if frequency_analysis::control_character_frequency(d1.chars()) > frequency_analysis::control_character_frequency(d2.chars()) {
-                Ordering::Greater
-            } else {
-                Ordering::Equal
-            }
-        } else {
-            Ordering::Equal
-        });
-
-    // sort by number of uppercase letters (should probably filter on freq being close)
-    // possible_decodes.sort_by(|&(ref d1, _), &(ref d2, _)|
-    //  if d1.to_ascii_lowercase() != d2.to_ascii_lowercase() {
-    //      Ordering::Equal
-    //  } else if frequency_analysis::alphabetic_uppercase_frequency(d1.chars()) < frequency_analysis::alphabetic_uppercase_frequency(d2.chars()) {
-    //      println!("!Equal");
-    //      Ordering::Less
-    //  } else {
-    //      println!("!Equal");
-    //      Ordering::Greater
-    //  });
-
-    // for &(ref k, f) in possible_decodes.iter().take(10) {
-    //  //let f : () = k;
-    //  println!("{}: {:?}", f, k);
-    // }
 
         return possible_decodes;
     }
@@ -66,28 +25,36 @@ impl<'a, II> SingleByteXorDecodable for II
 
 pub fn find_best_decode_candidates_for_slice(bit_strings : &[&[u8]], 
                                              character_frequencies : &BTreeMap<char, f32>)
-                                             -> Vec<(String, f32)> {
-    let mut best_decode_candidates : Vec<(String, f32)> = Vec::new();
+                                             -> Vec<String> {
+    let mut best_decode_candidates : Vec<String> = Vec::new();
     for s in bit_strings {
-        best_decode_candidates.push(s.find_single_byte_xor_textual_decode_candidates(character_frequencies).remove(0));
+        let mut bit_string_decodes = s.find_all_single_byte_xor_decode_candidates();
+        bit_string_decodes = utility::filter_strings_heuristically(bit_string_decodes);
+        if bit_string_decodes.len() > 0 {
+            best_decode_candidates.push(bit_string_decodes.remove(0));
+        }
     }
 
-    // Sort candidates by frequency, the one with the least distance to our ideal char freqs will be at the start of the list
-    best_decode_candidates.sort_by(|&(_, f1), &(_, f2)| if f1 < f2 {Ordering::Less} else {Ordering::Greater});
+    // TODO : Just sorting on the char freq at this point should be suffcient
+    best_decode_candidates = utility::filter_strings_heuristically(best_decode_candidates);
 
     return best_decode_candidates;
 }
 
 pub fn find_best_decode_candidates_for_vec(bit_strings : &Vec<Vec<u8>>, 
                                            character_frequencies : &BTreeMap<char, f32>)
-                                           -> Vec<(String, f32)> {
-    let mut best_decode_candidates : Vec<(String, f32)> = Vec::new();
+                                           -> Vec<String> {
+    let mut best_decode_candidates : Vec<String> = Vec::new();
     for s in bit_strings {
-        best_decode_candidates.push(s.find_single_byte_xor_textual_decode_candidates(character_frequencies).remove(0));
+        let mut bit_string_decodes = s.find_all_single_byte_xor_decode_candidates();
+        bit_string_decodes = utility::filter_strings_heuristically(bit_string_decodes);
+        if bit_string_decodes.len() > 0 {
+            best_decode_candidates.push(bit_string_decodes.remove(0));
+        }
     }
 
-    // Sort candidates by frequency, the one with the least distance to our ideal char freqs will be at the start of the list
-    best_decode_candidates.sort_by(|&(_, f1), &(_, f2)| if f1 < f2 {Ordering::Less} else {Ordering::Greater});
+    // TODO : Just sorting on the char freq at this point should be suffcient
+    best_decode_candidates = utility::filter_strings_heuristically(best_decode_candidates);
 
     return best_decode_candidates;
 }
@@ -96,6 +63,7 @@ pub fn find_best_decode_candidates_for_vec(bit_strings : &Vec<Vec<u8>>,
 mod tests {
     use rustc_serialize::hex::FromHex;
     use std::borrow::Borrow;
+    use utility;
     use frequency_analysis::{self, FrequencyAnalysable};
     use single_byte_xor::{self, SingleByteXorDecodable, find_best_decode_candidates_for_slice};
 
@@ -110,8 +78,9 @@ mod tests {
     fn matasano_find_single_byte_xor_plain_text() {
         let hex_bytes = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736".from_hex().unwrap();
         let hex_bytes_borrow : &[u8] = hex_bytes.borrow();
-        let mut decode_candidates = hex_bytes_borrow.find_single_byte_xor_textual_decode_candidates(&frequency_analysis::english_letter_frequencies());
-        assert_eq!(decode_candidates.remove(0).0, "Cooking MC's like a pound of bacon");
+        let mut decode_candidates = hex_bytes_borrow.find_all_single_byte_xor_decode_candidates();
+        decode_candidates = utility::filter_strings_heuristically(decode_candidates);
+        assert_eq!(decode_candidates.remove(0), "Cooking MC's like a pound of bacon");
     }
 
     #[test]
@@ -125,7 +94,7 @@ mod tests {
 
         let mut decode_candidates = find_best_decode_candidates_for_slice(encoded_slices.borrow(), &frequency_analysis::english_letter_frequencies());
 
-        assert_eq!(decode_candidates.remove(0).0, "Cooking MC's like a pound of bacon");
+        assert_eq!(decode_candidates.remove(0), "Cooking MC's like a pound of bacon");
     }
 }
 

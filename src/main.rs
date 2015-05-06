@@ -344,8 +344,8 @@ fn main() {
 
     let decode_candidates = single_byte_xor::find_best_decode_candidates_for_vec(&list_with_one_encoded_string, &frequency_analysis::english_letter_frequencies());
     
-    for decode_candidate in decode_candidates.iter().take(50) {
-        println!("{}", decode_candidate.0);
+    for decode_candidate in decode_candidates.iter().take(20) {
+        println!("{}", decode_candidate);
     }
 
     

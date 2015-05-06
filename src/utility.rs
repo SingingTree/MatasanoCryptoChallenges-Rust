@@ -1,4 +1,7 @@
+use std::iter::IntoIterator;
+use std::cmp::Ordering;
 use num::traits::Float;
+use frequency_analysis;
 
 pub trait ApproxEquality<T> {
     fn approx_equal(self, other: T) -> bool;
@@ -16,6 +19,27 @@ impl ApproxEquality<f64> for f64 {
         let epsilon : f64 = 0.000000001;
         return (self - other).abs() < epsilon;
     }
+}
+
+pub fn filter_strings_heuristically<II>(strings : II) -> Vec<String>
+    where II : IntoIterator<Item = String> {
+    let english_letter_freqs = frequency_analysis::english_letter_frequencies();
+    let filtered_iter = strings.into_iter()
+        // Cull strings that have a ratio of too many upper case chars
+        .filter(|s| frequency_analysis::alphabetic_uppercase_frequency(s.chars()) < 0.5)
+        // Cull strings that have a ratio of too many upper control chars
+        .filter(|s| frequency_analysis::control_character_frequency(s.chars()) < 0.15);
+    let mut output_strings : Vec<String> = filtered_iter.collect();
+    output_strings.sort_by(|s1, s2| {
+        let s1_distance = frequency_analysis::character_frequency_distance(s1.chars(), &english_letter_freqs);
+        let s2_distance = frequency_analysis::character_frequency_distance(s2.chars(), &english_letter_freqs);
+        if s1_distance < s2_distance {
+            Ordering::Less
+        } else {
+            Ordering::Greater
+        }
+    });
+    return output_strings;
 }
 
 #[cfg(test)]
