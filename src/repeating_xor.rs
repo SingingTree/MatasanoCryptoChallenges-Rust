@@ -3,6 +3,7 @@ use std::collections::btree_map::BTreeMap;
 use std::str::Chars;
 use std::borrow::Borrow;
 use single_byte_xor::SingleByteXorDecodable;
+use utility;
 
 trait RepeatingXorEncodable {
     type Output;
@@ -30,7 +31,9 @@ impl<I : Iterator + Clone> RepeatingXorEncodable for I
         return Ok(return_vec);
     }
 }
+
 impl RepeadtingXorDecodable for [u8] {
+    // Needs to be reworked, horribly inefficient
     fn find_repeating_xor_textual_decode_candidates(&self, character_frequencies : &BTreeMap<char, f32>) {
         //let decode_candidates_by_key_len : Vec<
         //for possible_key_len in 1..20 {
@@ -47,7 +50,8 @@ impl RepeadtingXorDecodable for [u8] {
             let mut decoded_strings : Vec<String> = Vec::new();
             for bit_string in &bit_strings_to_decode {
                 let bit_string_borrow : &[u8] = bit_string.borrow();
-                decoded_strings.push(bit_string_borrow.find_single_byte_xor_textual_decode_candidates(character_frequencies).remove(0).0);
+                decoded_strings = utility::filter_strings_heuristically(decoded_strings);
+                decoded_strings.push(bit_string_borrow.find_all_single_byte_xor_decode_candidates().remove(0));
             }
             
             let mut decoded_string_chars : Vec<Chars> = decoded_strings.iter().map(|x| x.chars()).collect();
