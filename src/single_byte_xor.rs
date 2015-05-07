@@ -1,6 +1,7 @@
 use std::iter::IntoIterator;
 use std::ops::BitXor;
 use utility;
+use frequency_analysis;
 
 pub trait SingleByteXorDecodable {
     // Find all possible decode candidates for the input and return a vector containing them
@@ -32,8 +33,7 @@ pub fn find_best_decode_candidates_for_slice_heuristically(bit_strings : &[&[u8]
         }
     }
 
-    // TODO : Just sorting on the char freq at this point should be suffcient
-    best_decode_candidates = utility::filter_strings_heuristically(best_decode_candidates);
+    utility::sort_string_vec_by_char_freq(&mut best_decode_candidates, &frequency_analysis::english_letter_frequencies());
 
     return best_decode_candidates;
 }
@@ -48,8 +48,7 @@ pub fn find_best_decode_candidates_for_vec_heuristically(bit_strings : &Vec<Vec<
         }
     }
 
-    // TODO : Just sorting on the char freq at this point should be suffcient
-    best_decode_candidates = utility::filter_strings_heuristically(best_decode_candidates);
+    utility::sort_string_vec_by_char_freq(&mut best_decode_candidates, &frequency_analysis::english_letter_frequencies());
 
     return best_decode_candidates;
 }
