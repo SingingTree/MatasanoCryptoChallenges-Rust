@@ -35,7 +35,15 @@ pub fn filter_strings_heuristically<II>(strings : II) -> Vec<String>
 }
 
 pub trait HammingDistancable<T> {
-    fn hamming_distance(&self, other: T) -> i32;
+    type Output;
+    fn hamming_distance(self, other: T) -> Self::Output;
+}
+
+impl<'a> HammingDistancable<&'a u8> for &'a u8 {
+    type Output = i32;
+    fn hamming_distance(self, other: &u8) -> i32 {
+        return 0;
+    }
 }
 
 #[inline]
