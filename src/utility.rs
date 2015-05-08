@@ -24,15 +24,18 @@ impl ApproxEquality<f64> for f64 {
 
 pub fn filter_strings_heuristically<II>(strings : II) -> Vec<String>
     where II : IntoIterator<Item = String> {
-    let english_letter_freqs = frequency_analysis::english_letter_frequencies();
     let filtered_iter = strings.into_iter()
         // Cull strings that have a ratio of too many upper case chars
         .filter(|s| frequency_analysis::alphabetic_uppercase_frequency(s.chars()) < 0.5)
         // Cull strings that have a ratio of too many upper control chars
         .filter(|s| frequency_analysis::control_character_frequency(s.chars()) < 0.15);
     let mut output_strings : Vec<String> = filtered_iter.collect();
-    sort_string_vec_by_char_freq(&mut output_strings, &english_letter_freqs);
+    sort_string_vec_by_char_freq(&mut output_strings, &frequency_analysis::english_letter_frequencies());
     return output_strings;
+}
+
+pub trait HammingDistancable<T> {
+    fn hamming_distance(&self, other: T) -> i32;
 }
 
 #[inline]
