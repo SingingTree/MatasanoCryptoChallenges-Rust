@@ -7,3 +7,4 @@ authors = ["SingingTree"]
 [dependencies]
 rustc-serialize = "*"
 num = "*"
+bits = "*"
