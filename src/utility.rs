@@ -43,14 +43,14 @@ impl<'a> HammingDistancable<&'a u8> for &'a u8 {
     type Output = u32;
     fn hamming_distance(self, other: &u8) -> u32 {
         let mut distance : u32 = 0;
-        if (self ^ other) & 0x01 > 0 { distance += 1}
-        if ((self ^ other) >> 1) & 0x01 > 0 { distance += 1}
-        if ((self ^ other) >> 2) & 0x01 > 0 { distance += 1}
-        if ((self ^ other) >> 3) & 0x01 > 0 { distance += 1}
-        if ((self ^ other) >> 4) & 0x01 > 0 { distance += 1}
-        if ((self ^ other) >> 5) & 0x01 > 0 { distance += 1}
-        if ((self ^ other) >> 6) & 0x01 > 0 { distance += 1}
-        if ((self ^ other) >> 7) & 0x01 > 0 { distance += 1}
+        distance += ((self ^ other)  & 0x01) as u32;
+        distance += (((self ^ other) >> 1) & 0x01) as u32;
+        distance += (((self ^ other) >> 2) & 0x01) as u32;
+        distance += (((self ^ other) >> 3) & 0x01) as u32;
+        distance += (((self ^ other) >> 4) & 0x01) as u32;
+        distance += (((self ^ other) >> 5) & 0x01) as u32;
+        distance += (((self ^ other) >> 6) & 0x01) as u32;
+        distance += (((self ^ other) >> 7) & 0x01) as u32;
         return distance;
     }
 }
