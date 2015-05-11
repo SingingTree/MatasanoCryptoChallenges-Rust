@@ -55,15 +55,17 @@ impl<'a, 'b> HammingDistancable<&'a u8> for &'b u8 {
     }
 }
 
-// TODO: change this to return a algebraic type that indicates failure of both vecs don't have equal length
 impl<'a, 'b> HammingDistancable<&'a Vec<u8>> for &'b Vec<u8> {
-    type Output = u32;
-    fn hamming_distance(self, other: &Vec<u8>) -> u32 {
+    type Output = Result<u32, &'static str>;
+    fn hamming_distance(self, other: &Vec<u8>) -> Result<u32, &'static str> {
+        if self.len() != other.len() {
+            return Err("Vectors do not have equal length")
+        }
         let mut distance : u32 = 0;
         for (b1, b2) in self.iter().zip(other.iter()) {
             distance += b1.hamming_distance(b2);
         }
-        return distance;
+        return Ok(distance);
     }
 }
 
@@ -131,6 +133,21 @@ mod tests {
         byte_vec2.push(0xFF);
         // Distance of 7 on second bytes
 
-        assert!(byte_vec1.hamming_distance(&byte_vec2) == 8);
+        assert!(byte_vec1.hamming_distance(&byte_vec2).unwrap() == 8);
+    }
+
+    #[test]
+    fn u8_vec_hamming_distance_error() {
+        let mut byte_vec1 : Vec<u8> = Vec::new();
+        let mut byte_vec2 : Vec<u8> = Vec::new();
+
+        byte_vec1.push(0x01);
+        byte_vec2.push(0x03);
+        // Distance of 1 on first bytes
+
+        byte_vec2.push(0xFF);
+        // Byte vec 1 has no second element
+
+        assert!(byte_vec1.hamming_distance(&byte_vec2).unwrap_err() == "Vectors do not have equal length");
     }
 }
