@@ -39,7 +39,7 @@ pub trait HammingDistancable<T> {
     fn hamming_distance(self, other: T) -> Self::Output;
 }
 
-impl<'a> HammingDistancable<&'a u8> for &'a u8 {
+impl<'a, 'b> HammingDistancable<&'a u8> for &'b u8 {
     type Output = u32;
     fn hamming_distance(self, other: &u8) -> u32 {
         let mut distance : u32 = 0;
@@ -51,6 +51,18 @@ impl<'a> HammingDistancable<&'a u8> for &'a u8 {
         distance += (((self ^ other) >> 5) & 0x01) as u32;
         distance += (((self ^ other) >> 6) & 0x01) as u32;
         distance += (((self ^ other) >> 7) & 0x01) as u32;
+        return distance;
+    }
+}
+
+// TODO: change this to return a algebraic type that indicates failure of both vecs don't have equal length
+impl<'a, 'b> HammingDistancable<&'a Vec<u8>> for &'b Vec<u8> {
+    type Output = u32;
+    fn hamming_distance(self, other: &Vec<u8>) -> u32 {
+        let mut distance : u32 = 0;
+        for (b1, b2) in self.iter().zip(other.iter()) {
+            distance += b1.hamming_distance(b2);
+        }
         return distance;
     }
 }
@@ -104,5 +116,21 @@ mod tests {
 
         assert!(byte3.hamming_distance(&byte4) == 7);
         assert!(byte4.hamming_distance(&byte3) == 7);
+    }
+
+    #[test]
+    fn u8_vec_hamming_distance() {
+        let mut byte_vec1 : Vec<u8> = Vec::new();
+        let mut byte_vec2 : Vec<u8> = Vec::new();
+
+        byte_vec1.push(0x01);
+        byte_vec2.push(0x03);
+        // Distance of 1 on first bytes
+
+        byte_vec1.push(0x01);
+        byte_vec2.push(0xFF);
+        // Distance of 7 on second bytes
+
+        assert!(byte_vec1.hamming_distance(&byte_vec2) == 8);
     }
 }
