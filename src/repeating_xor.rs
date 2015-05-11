@@ -16,7 +16,7 @@ trait RepeadtingXorDecodable {
 }
 
 impl<I : Iterator + Clone> RepeatingXorEncodable for I
-    where <Self as Iterator>::Item : BitXor {
+    where I::Item : BitXor {
     type Output = Result<Vec<<<Self as Iterator>::Item as BitXor>::Output>, &'static str>;
 
     fn repeating_xor_encode(self, key : Self) -> Result<Vec<<<Self as Iterator>::Item as BitXor>::Output>, &'static str>{

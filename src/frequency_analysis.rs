@@ -43,7 +43,7 @@ fn frequencies_from_iter<I : Iterator>(iter : I) -> BTreeMap<<I as Iterator>::It
 }
 
 impl<II : IntoIterator> FrequencyAnalysable for II
-	where <<Self as IntoIterator>::IntoIter as Iterator>::Item : Ord {
+	where II::Item : Ord {
 	type Item = <<Self as IntoIterator>::IntoIter as Iterator>::Item;
 
 	fn occurrences(self) -> BTreeMap<<II as FrequencyAnalysable>::Item, usize> {
