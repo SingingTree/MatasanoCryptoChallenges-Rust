@@ -34,46 +34,6 @@ pub fn filter_strings_heuristically<II>(strings : II) -> Vec<String>
     return output_strings;
 }
 
-pub trait HammingDistancable<T> {
-    type Output;
-    fn hamming_distance(self, other: T) -> Self::Output;
-}
-
-impl<'a, 'b> HammingDistancable<&'a u8> for &'b u8 {
-    type Output = u32;
-    fn hamming_distance(self, other: &u8) -> u32 {
-        return (self ^ other).count_ones();
-    }
-}
-
-impl<'a, 'b> HammingDistancable<&'a Vec<u8>> for &'b Vec<u8> {
-    type Output = Result<u32, &'static str>;
-    fn hamming_distance(self, other: &Vec<u8>) -> Result<u32, &'static str> {
-        if self.len() != other.len() {
-            return Err("Vectors do not have equal length")
-        }
-        let mut distance : u32 = 0;
-        for (b1, b2) in self.iter().zip(other.iter()) {
-            distance += b1.hamming_distance(b2);
-        }
-        return Ok(distance);
-    }
-}
-
-impl<'a, 'b> HammingDistancable<&'a [u8]> for &'b [u8] {
-    type Output = Result<u32, &'static str>;
-    fn hamming_distance(self, other: &[u8]) -> Result<u32, &'static str> {
-        if self.len() != other.len() {
-            return Err("Slices do not have equal length")
-        }
-        let mut distance : u32 = 0;
-        for (b1, b2) in self.iter().zip(other.iter()) {
-            distance += b1.hamming_distance(b2);
-        }
-        return Ok(distance);
-    }
-}
-
 #[inline]
 pub fn sort_string_vec_by_char_freq(strings : &mut Vec<String>, character_frequencies : &BTreeMap<char, f32>) {
     strings.sort_by(|s1, s2| {
@@ -90,7 +50,6 @@ pub fn sort_string_vec_by_char_freq(strings : &mut Vec<String>, character_freque
 #[cfg(test)]
 mod tests {
     use utility::ApproxEquality;
-    use utility::HammingDistancable;
 
     #[test]
     fn f32_approx_equal() {
@@ -108,63 +67,5 @@ mod tests {
 
         assert!(!num1.approx_equal(num2));
         assert!(!num2.approx_equal(num1));
-    }
-
-    #[test]
-    fn u8_hamming_distance() {
-        let byte1 : u8 = 0x01;
-        let byte2 : u8 = 0x03;
-
-        assert!(byte1.hamming_distance(&byte2) == 1);
-        assert!(byte2.hamming_distance(&byte1) == 1);
-
-        let byte3 : u8 = 0x01;
-        let byte4 : u8 = 0xFF;
-
-        assert!(byte3.hamming_distance(&byte4) == 7);
-        assert!(byte4.hamming_distance(&byte3) == 7);
-    }
-
-    #[test]
-    fn u8_vec_hamming_distance() {
-        let mut byte_vec1 : Vec<u8> = Vec::new();
-        let mut byte_vec2 : Vec<u8> = Vec::new();
-
-        byte_vec1.push(0x01);
-        byte_vec2.push(0x03);
-
-        byte_vec1.push(0x01);
-        byte_vec2.push(0xFF);
-
-        assert!(byte_vec1.hamming_distance(&byte_vec2).unwrap() == 8);
-    }
-
-    #[test]
-    fn u8_vec_hamming_distance_error() {
-        let mut byte_vec1 : Vec<u8> = Vec::new();
-        let mut byte_vec2 : Vec<u8> = Vec::new();
-
-        byte_vec1.push(0x01);
-        byte_vec2.push(0x03);
-
-        byte_vec2.push(0xFF);
-
-        assert!(byte_vec1.hamming_distance(&byte_vec2).unwrap_err() == "Vectors do not have equal length");
-    }
-
-    #[test]
-    fn u8_slice_hamming_distance() {
-        let byte_slice1 : &[u8] = &[0x01, 0x01];
-        let byte_slice2 : &[u8] = &[0x03, 0xFF];
-
-        assert!(byte_slice1.hamming_distance(byte_slice2).unwrap() == 8);
-    }
-
-    #[test]
-    fn u8_slice_hamming_distance_error() {
-        let byte_slice1 : &[u8] = &[0x01];
-        let byte_slice2 : &[u8] = &[0x03, 0xFF];
-
-        assert!(byte_slice1.hamming_distance(byte_slice2).unwrap_err() == "Slices do not have equal length");
     }
 }

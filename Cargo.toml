@@ -2,8 +2,9 @@
 
 name = "matasano_crypto_challenges"
 version = "0.1.3"
-authors = ["SingingTree"]
+authors = ["Bryce Van Dyk"]
 
 [dependencies]
 rustc-serialize = "*"
+rust_hamming_distance = "*"
 num = "*"

@@ -1,5 +1,6 @@
 extern crate rustc_serialize;
 extern crate num;
+extern crate rust_hamming_distance;
 
 pub mod base64;
 pub mod fixed_xor;
