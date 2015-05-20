@@ -94,7 +94,7 @@ impl RepeatingXorDecodable for [u8] {
 
 #[cfg(test)]
 mod tests {
-    use repeating_xor::RepeatingXorDecodable;
+    use repeating_xor::RepeatingXorEncodable;
     use rustc_serialize::hex::FromHex;
 
     #[test]
