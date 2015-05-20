@@ -11,7 +11,7 @@ trait RepeatingXorEncodable {
     fn repeating_xor_encode(self, key : Self) -> Self::Output;  
 }
 
-trait RepeadtingXorDecodable {
+trait RepeatingXorDecodable {
     fn find_repeating_xor_textual_decode_candidates(&self, character_frequencies : &BTreeMap<char, f32>);
 }
 
@@ -32,7 +32,7 @@ impl<I : Iterator + Clone> RepeatingXorEncodable for I
     }
 }
 
-impl RepeadtingXorDecodable for [u8] {
+impl RepeatingXorDecodable for [u8] {
     // Needs to be reworked, horribly inefficient
     fn find_repeating_xor_textual_decode_candidates(&self, character_frequencies : &BTreeMap<char, f32>) {
         //let decode_candidates_by_key_len : Vec<
@@ -94,7 +94,7 @@ impl RepeadtingXorDecodable for [u8] {
 
 #[cfg(test)]
 mod tests {
-    use repeating_xor::RepeatingXorEncodable;
+    use repeating_xor::RepeatingXorDecodable;
     use rustc_serialize::hex::FromHex;
 
     #[test]
