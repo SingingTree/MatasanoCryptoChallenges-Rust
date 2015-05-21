@@ -33,62 +33,68 @@ impl<I : Iterator + Clone> RepeatingXorEncodable for I
 }
 
 impl RepeatingXorDecodable for [u8] {
-    // Needs to be reworked, horribly inefficient
     fn find_repeating_xor_textual_decode_candidates(&self, character_frequencies : &BTreeMap<char, f32>) {
-        //let decode_candidates_by_key_len : Vec<
-        //for possible_key_len in 1..20 {
-        for possible_key_len in 1..3 { // For testing purposes
-            let mut bit_strings_to_decode : Vec<Vec<u8>> = Vec::new();
-            for _i in 0..possible_key_len {
-                bit_strings_to_decode.push(Vec::new());
+        if self.len() < 1 {
+            return; // TODO: return an error
+        }
+        let mut min_edit_distance_and_key_len = (0, 0);
+
+        for possible_key_len in 1..40 {
+            if possible_key_len > self.len() / 2 {
+                break;
             }
+        }
 
-            for (i, byte) in self.iter().enumerate() {
-                bit_strings_to_decode[i % possible_key_len].push(*byte);
-            }
+        let mut bit_strings_to_decode : Vec<Vec<u8>> = Vec::new();
+        for _i in 0..min_edit_distance_and_key_len.1 {
+            bit_strings_to_decode.push(Vec::new());
+        }
 
-            let mut decoded_strings : Vec<String> = Vec::new();
-            for bit_string in &bit_strings_to_decode {
-                let bit_string_borrow : &[u8] = bit_string.borrow();
-                decoded_strings = utility::filter_strings_heuristically(decoded_strings);
-                decoded_strings.push(bit_string_borrow.find_all_single_byte_xor_decode_candidates().remove(0));
-            }
-            
-            let mut decoded_string_chars : Vec<Chars> = decoded_strings.iter().map(|x| x.chars()).collect();
+        for (i, byte) in self.iter().enumerate() {
+            bit_strings_to_decode[i % min_edit_distance_and_key_len.1].push(*byte);
+        }
 
-            let mut decode_candidate_for_key_len = String::new();
+        let mut decoded_strings : Vec<String> = Vec::new();
+        for bit_string in &bit_strings_to_decode {
+            let bit_string_borrow : &[u8] = bit_string.borrow();
+            decoded_strings = utility::filter_strings_heuristically(decoded_strings);
+            decoded_strings.push(bit_string_borrow.find_all_single_byte_xor_decode_candidates().remove(0));
+        }
+        
+        let mut decoded_string_chars : Vec<Chars> = decoded_strings.iter().map(|x| x.chars()).collect();
 
-            // for s in &decoded_strings {
-            //  println!("{}", s);
-            // }
+        let mut decode_candidate_for_key_len = String::new();
 
-            // for mut chars in decoded_string_chars {
-            //  loop {
-            //      match chars.next() {
-            //          None => break,
-            //          Some(c) => print!("{}", c)
-            //      }
-            //  }
-                    
-            //  println!("");
-            // }
+        // for s in &decoded_strings {
+        //  println!("{}", s);
+        // }
 
-            // for c in &decoded_string_chars[0] {
-            //  println!("{}", c);
-            // }
+        // for mut chars in decoded_string_chars {
+        //  loop {
+        //      match chars.next() {
+        //          None => break,
+        //          Some(c) => print!("{}", c)
+        //      }
+        //  }
+                
+        //  println!("");
+        // }
 
-            let mut creating_decode_candidate = true;
-            while creating_decode_candidate {
-                for mut char_iter in decoded_string_chars.iter_mut() {
-                    match char_iter.next()  { // All broken here
-                        None => creating_decode_candidate = false,
-                        Some(c) => decode_candidate_for_key_len.push(c)
-                    }
+        // for c in &decoded_string_chars[0] {
+        //  println!("{}", c);
+        // }
+
+        let mut creating_decode_candidate = true;
+        while creating_decode_candidate {
+            for mut char_iter in decoded_string_chars.iter_mut() {
+                match char_iter.next()  { // All broken here
+                    None => creating_decode_candidate = false,
+                    Some(c) => decode_candidate_for_key_len.push(c)
                 }
             }
-
-            println!("{}", decode_candidate_for_key_len);
         }
+
+        println!("{}", decode_candidate_for_key_len);
     }
 }
 
