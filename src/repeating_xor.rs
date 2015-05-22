@@ -4,6 +4,7 @@ use std::str::Chars;
 use std::borrow::Borrow;
 use single_byte_xor::SingleByteXorDecodable;
 use utility;
+use rust_hamming_distance::bitwise_hamming_distance::BitwiseHammingDistancable;
 
 trait RepeatingXorEncodable {
     type Output;
@@ -12,20 +13,26 @@ trait RepeatingXorEncodable {
 }
 
 trait RepeatingXorDecodable {
-    fn find_repeating_xor_textual_decode_candidates(&self, character_frequencies : &BTreeMap<char, f32>);
+    type Output;
+
+    fn find_repeating_xor_textual_decode_candidates(&self,
+                                                    character_frequencies : &BTreeMap<char, f32>)
+                                                    -> Self::Output;
 }
 
 impl<I : Iterator + Clone> RepeatingXorEncodable for I
     where I::Item : BitXor {
     type Output = Result<Vec<<<Self as Iterator>::Item as BitXor>::Output>, &'static str>;
 
-    fn repeating_xor_encode(self, key : Self) -> Result<Vec<<<Self as Iterator>::Item as BitXor>::Output>, &'static str>{
+    fn repeating_xor_encode(self, key : Self)
+                            -> Result<Vec<<<Self as Iterator>::Item as BitXor>::Output>, &'static str>{
         let mut return_vec = Vec::new();
         let mut key_cycle = key.cycle();
         for item in self {
             match key_cycle.next() {
                 Some(thing) => return_vec.push(item ^ thing),
-                None => return Err("Error itering key for repeating XOR, none returned by iter where element expected")
+                None => return Err("Error itering key for repeating XOR, \
+                    none returned by iter where element expected")
             }
         }
         return Ok(return_vec);
@@ -33,15 +40,42 @@ impl<I : Iterator + Clone> RepeatingXorEncodable for I
 }
 
 impl RepeatingXorDecodable for [u8] {
-    fn find_repeating_xor_textual_decode_candidates(&self, character_frequencies : &BTreeMap<char, f32>) {
-        if self.len() < 1 {
-            return; // TODO: return an error
-        }
-        let mut min_edit_distance_and_key_len = (0, 0);
+    type Output = Result<Vec<String>, String>;
 
-        for possible_key_len in 1..40 {
-            if possible_key_len > self.len() / 2 {
-                break;
+    fn find_repeating_xor_textual_decode_candidates(&self, 
+                                                    character_frequencies : &BTreeMap<char, f32>)
+                                                    -> Result<Vec<String>, String> {
+        if self.len() < 1 {
+            return Ok(Vec::new());
+        }
+        let mut min_edit_distance_and_key_len = (-1, 0);
+
+        if(self.len() <= 2) {
+            min_edit_distance_and_key_len = (-1, 1);
+        } else {
+            let mut edit_distance = self[..1].bitwise_hamming_distance(&self[1..2]);
+            match edit_distance {
+                Ok(ed) => min_edit_distance_and_key_len = (ed, 1),
+                Err(e) => return Err("find repeating xor failed attempting to calulate \
+                                      hamming distance on iteration 1 with following \
+                                      error\n".to_owned() + e)
+            }
+            for possible_key_len in 2..40 {
+                if possible_key_len > self.len() / 2 {
+                    break;
+                }
+                edit_distance = self[..possible_key_len].bitwise_hamming_distance(&self[possible_key_len..possible_key_len * 2]);
+                 match edit_distance {
+                    Ok(ed) => {
+                        if ed < min_edit_distance_and_key_len.0 {
+                            min_edit_distance_and_key_len = (ed, possible_key_len)
+                        }
+                    },
+                    Err(e) => return Err("find repeating xor failed attempting to calulate \
+                                      hamming distance on iteration ".to_owned() +
+                                      &possible_key_len.to_string() +
+                                      &" with following error\n".to_owned() + e)
+                }
             }
         }
 
@@ -95,6 +129,7 @@ impl RepeatingXorDecodable for [u8] {
         }
 
         println!("{}", decode_candidate_for_key_len);
+        return Ok(Vec::new());
     }
 }
 
