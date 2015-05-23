@@ -45,12 +45,14 @@ impl RepeatingXorDecodable for [u8] {
     fn find_repeating_xor_textual_decode_candidates(&self, 
                                                     character_frequencies : &BTreeMap<char, f32>)
                                                     -> Result<Vec<String>, String> {
+
+        // Find smallest edit distance, this is likely to be the size of the key
         if self.len() < 1 {
             return Ok(Vec::new());
         }
         let mut min_edit_distance_and_key_len = (-1, 0);
 
-        if(self.len() <= 2) {
+        if self.len() <= 2 {
             min_edit_distance_and_key_len = (-1, 1);
         } else {
             let mut edit_distance = self[..1].bitwise_hamming_distance(&self[1..2]);
@@ -78,57 +80,46 @@ impl RepeatingXorDecodable for [u8] {
                 }
             }
         }
+        // Got our edit distance, now use it to decode
 
+        // Create n vectors for each different char in the key
+        // i.e. if the key is CATS, all chars encoded by the C should be in the first vec
+        // A in the second vec, and so on and so forth
+        let suppose_key_length = min_edit_distance_and_key_len.1;
         let mut bit_strings_to_decode : Vec<Vec<u8>> = Vec::new();
-        for _i in 0..min_edit_distance_and_key_len.1 {
+        for _i in 0..suppose_key_length {
             bit_strings_to_decode.push(Vec::new());
         }
 
         for (i, byte) in self.iter().enumerate() {
-            bit_strings_to_decode[i % min_edit_distance_and_key_len.1].push(*byte);
+            bit_strings_to_decode[i % suppose_key_length].push(*byte);
         }
 
         let mut decoded_strings : Vec<String> = Vec::new();
         for bit_string in &bit_strings_to_decode {
             let bit_string_borrow : &[u8] = bit_string.borrow();
-            decoded_strings = utility::filter_strings_heuristically(decoded_strings);
-            decoded_strings.push(bit_string_borrow.find_all_single_byte_xor_decode_candidates().remove(0));
+            decoded_strings.push(
+                utility::filter_strings_heuristically(
+                    bit_string_borrow.find_all_single_byte_xor_decode_candidates()
+                ).remove(0)
+            );   
         }
         
         let mut decoded_string_chars : Vec<Chars> = decoded_strings.iter().map(|x| x.chars()).collect();
 
-        let mut decode_candidate_for_key_len = String::new();
-
-        // for s in &decoded_strings {
-        //  println!("{}", s);
-        // }
-
-        // for mut chars in decoded_string_chars {
-        //  loop {
-        //      match chars.next() {
-        //          None => break,
-        //          Some(c) => print!("{}", c)
-        //      }
-        //  }
-                
-        //  println!("");
-        // }
-
-        // for c in &decoded_string_chars[0] {
-        //  println!("{}", c);
-        // }
+        let mut decode_candidate = String::new();
 
         let mut creating_decode_candidate = true;
         while creating_decode_candidate {
             for mut char_iter in decoded_string_chars.iter_mut() {
-                match char_iter.next()  { // All broken here
+                match char_iter.next()  {
                     None => creating_decode_candidate = false,
-                    Some(c) => decode_candidate_for_key_len.push(c)
+                    Some(c) => decode_candidate.push(c)
                 }
             }
         }
 
-        println!("{}", decode_candidate_for_key_len);
+        println!("{}", decode_candidate);
         return Ok(Vec::new());
     }
 }

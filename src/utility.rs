@@ -26,9 +26,9 @@ pub fn filter_strings_heuristically<II>(strings : II) -> Vec<String>
     where II : IntoIterator<Item = String> {
     let filtered_iter = strings.into_iter()
         // Cull strings that have a ratio of too many upper case chars
-        .filter(|s| frequency_analysis::alphabetic_uppercase_frequency(s.chars()) < 0.5)
+        .filter(|s| frequency_analysis::alphabetic_uppercase_frequency(s.chars()) < 0.35)
         // Cull strings that have a ratio of too many upper control chars
-        .filter(|s| frequency_analysis::control_character_frequency(s.chars()) < 0.15);
+        .filter(|s| frequency_analysis::control_character_frequency(s.chars()) < 0.10);
     let mut output_strings : Vec<String> = filtered_iter.collect();
     sort_string_vec_by_char_freq(&mut output_strings, &frequency_analysis::english_letter_frequencies());
     return output_strings;
