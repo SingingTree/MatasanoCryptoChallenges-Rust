@@ -6,18 +6,18 @@ use single_byte_xor::SingleByteXorDecodable;
 use utility;
 use rust_hamming_distance::bitwise_hamming_distance::BitwiseHammingDistancable;
 
-trait RepeatingXorEncodable {
+pub trait RepeatingXorEncodable {
     type Output;
 
     fn repeating_xor_encode(self, key : Self) -> Self::Output;  
 }
 
-trait RepeatingXorDecodable {
+pub trait RepeatingXorDecodable {
     type Output;
 
-    fn find_repeating_xor_textual_decode_candidates(&self,
-                                                    character_frequencies : &BTreeMap<char, f32>)
-                                                    -> Self::Output;
+    fn find_repeating_xor_decode(&self,
+                                 character_frequencies : &BTreeMap<char, f32>)
+                                 -> Self::Output;
 }
 
 impl<I : Iterator + Clone> RepeatingXorEncodable for I
@@ -40,15 +40,15 @@ impl<I : Iterator + Clone> RepeatingXorEncodable for I
 }
 
 impl RepeatingXorDecodable for [u8] {
-    type Output = Result<Vec<String>, String>;
+    type Output = Result<String, String>;
 
-    fn find_repeating_xor_textual_decode_candidates(&self, 
-                                                    character_frequencies : &BTreeMap<char, f32>)
-                                                    -> Result<Vec<String>, String> {
+    fn find_repeating_xor_decode(&self, 
+                                 character_frequencies : &BTreeMap<char, f32>)
+                                 -> Result<String, String> {
 
         // Find smallest edit distance, this is likely to be the size of the key
         if self.len() < 1 {
-            return Ok(Vec::new());
+            return Ok(String::new());
         }
         let mut min_edit_distance_and_key_len = (-1, 0);
 
@@ -85,14 +85,14 @@ impl RepeatingXorDecodable for [u8] {
         // Create n vectors for each different char in the key
         // i.e. if the key is CATS, all chars encoded by the C should be in the first vec
         // A in the second vec, and so on and so forth
-        let suppose_key_length = min_edit_distance_and_key_len.1;
+        let supposed_key_length = min_edit_distance_and_key_len.1;
         let mut bit_strings_to_decode : Vec<Vec<u8>> = Vec::new();
-        for _i in 0..suppose_key_length {
+        for _i in 0..supposed_key_length {
             bit_strings_to_decode.push(Vec::new());
         }
 
         for (i, byte) in self.iter().enumerate() {
-            bit_strings_to_decode[i % suppose_key_length].push(*byte);
+            bit_strings_to_decode[i % supposed_key_length].push(*byte);
         }
 
         let mut decoded_strings : Vec<String> = Vec::new();
@@ -100,7 +100,7 @@ impl RepeatingXorDecodable for [u8] {
             let bit_string_borrow : &[u8] = bit_string.borrow();
             decoded_strings.push(
                 utility::filter_strings_heuristically(
-                    bit_string_borrow.find_all_single_byte_xor_decode_candidates()
+                    bit_string_borrow.find_all_single_byte_xor_decodes()
                 ).remove(0)
             );   
         }
@@ -120,13 +120,15 @@ impl RepeatingXorDecodable for [u8] {
         }
 
         println!("{}", decode_candidate);
-        return Ok(Vec::new());
+        return Ok(decode_candidate);
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use repeating_xor::RepeatingXorEncodable;
+    use std::borrow::Borrow;
+    use repeating_xor::{RepeatingXorEncodable, RepeatingXorDecodable};
+    use frequency_analysis::english_letter_frequencies;
     use rustc_serialize::hex::FromHex;
 
     #[test]
@@ -146,5 +148,16 @@ mod tests {
         let expected_output = "0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f".from_hex().unwrap();
 
         assert_eq!(plaintext_string.as_bytes().iter().repeating_xor_encode(key.as_bytes().iter()).unwrap(), expected_output);
+    }
+
+    #[test]
+    fn test_string_repeating_xor_round_trip() {
+        let plaintext_string = "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal";
+        let key = "ICE";
+        let byte_vec = plaintext_string.as_bytes().iter().repeating_xor_encode(key.as_bytes().iter()).unwrap();
+        let byte_slice : &[u8] = byte_vec.borrow();
+        let decoded_string : String = byte_slice.find_repeating_xor_decode(&english_letter_frequencies()).unwrap();
+
+        assert_eq!(decoded_string, plaintext_string);
     }
 }
