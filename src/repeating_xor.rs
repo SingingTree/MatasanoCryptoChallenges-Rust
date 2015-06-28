@@ -46,19 +46,20 @@ impl RepeatingXorDecodable for [u8] {
                                  character_frequencies : &BTreeMap<char, f32>)
                                  -> Result<String, String> {
 
-        // Find smallest edit distance, this is likely to be the size of the key
+        println!("{:?}", self);
+        // Find smallest edit distances, one of these is likely to be the key length
         if self.len() < 1 {
             return Ok(String::new());
         }
-        let mut min_edit_distance_and_key_len = (-1, 0);
+        let mut normalised_edit_distance_and_lengths = Vec::new();
 
         if self.len() <= 2 {
-            min_edit_distance_and_key_len = (-1, 1);
+            normalised_edit_distance_and_lengths.push((0f32, 1));
         } else {
             let mut edit_distance = self[..1].bitwise_hamming_distance(&self[1..2]);
             match edit_distance {
-                Ok(ed) => min_edit_distance_and_key_len = (ed, 1),
-                Err(e) => return Err("find repeating xor failed attempting to calulate \
+                Ok(ed) => normalised_edit_distance_and_lengths.push((ed as f32, 1)),
+                Err(e) => return Err("Find repeating xor failed attempting to calulate \
                                       hamming distance on iteration 1 with following \
                                       error\n".to_owned() + e)
             }
@@ -67,60 +68,70 @@ impl RepeatingXorDecodable for [u8] {
                     break;
                 }
                 edit_distance = self[..possible_key_len].bitwise_hamming_distance(&self[possible_key_len..possible_key_len * 2]);
-                 match edit_distance {
+                match edit_distance {
                     Ok(ed) => {
-                        if ed < min_edit_distance_and_key_len.0 {
-                            min_edit_distance_and_key_len = (ed, possible_key_len)
-                        }
+                        let normalised_ed = (ed as f32) / (possible_key_len as f32);
+                        normalised_edit_distance_and_lengths.push((normalised_ed, possible_key_len))
                     },
-                    Err(e) => return Err("find repeating xor failed attempting to calulate \
+                    Err(e) => return Err("Find repeating xor failed attempting to calulate \
                                       hamming distance on iteration ".to_owned() +
                                       &possible_key_len.to_string() +
                                       &" with following error\n".to_owned() + e)
                 }
             }
         }
-        // Got our edit distance, now use it to decode
+        normalised_edit_distance_and_lengths.sort_by(|&(ed1, _), &(ed2, _)|
+            ed2.partial_cmp(&ed1).unwrap());
+        for &(ed, len) in normalised_edit_distance_and_lengths.iter() {
+            println!("{:?}, {:?}", ed, len);
+        }
+        // Got our edit distances, now we can use the top however many as possible keys
 
         // Create n vectors for each different char in the key
         // i.e. if the key is CATS, all chars encoded by the C should be in the first vec
         // A in the second vec, and so on and so forth
-        let supposed_key_length = min_edit_distance_and_key_len.1;
-        let mut bit_strings_to_decode : Vec<Vec<u8>> = Vec::new();
-        for _i in 0..supposed_key_length {
-            bit_strings_to_decode.push(Vec::new());
-        }
-
-        for (i, byte) in self.iter().enumerate() {
-            bit_strings_to_decode[i % supposed_key_length].push(*byte);
-        }
-
-        let mut decoded_strings : Vec<String> = Vec::new();
-        for bit_string in &bit_strings_to_decode {
-            let bit_string_borrow : &[u8] = bit_string.borrow();
-            decoded_strings.push(
-                utility::filter_strings_heuristically(
-                    bit_string_borrow.find_all_single_byte_xor_decodes()
-                ).remove(0)
-            );   
-        }
-        
-        let mut decoded_string_chars : Vec<Chars> = decoded_strings.iter().map(|x| x.chars()).collect();
-
-        let mut decode_candidate = String::new();
-
-        let mut creating_decode_candidate = true;
-        while creating_decode_candidate {
-            for mut char_iter in decoded_string_chars.iter_mut() {
-                match char_iter.next()  {
-                    None => creating_decode_candidate = false,
-                    Some(c) => decode_candidate.push(c)
+        match normalised_edit_distance_and_lengths.pop() {
+            Some((_, len)) => {
+                let supposed_key_length = len;
+                let mut bit_strings_to_decode : Vec<Vec<u8>> = Vec::new();
+                for _i in 0..supposed_key_length {
+                    bit_strings_to_decode.push(Vec::new());
                 }
-            }
-        }
 
-        println!("{}", decode_candidate);
-        return Ok(decode_candidate);
+                for (i, byte) in self.iter().enumerate() {
+                    bit_strings_to_decode[i % supposed_key_length].push(*byte);
+                }
+
+                let mut decoded_strings : Vec<String> = Vec::new();
+                for bit_string in &bit_strings_to_decode {
+                    let bit_string_borrow : &[u8] = bit_string.borrow();
+                    decoded_strings.push(
+                        utility::filter_strings_heuristically(
+                            bit_string_borrow.find_all_single_byte_xor_decodes()
+                        ).remove(0)
+                    );   
+                }
+                
+                let mut decoded_string_chars : Vec<Chars> = decoded_strings.iter().map(|x| x.chars()).collect();
+
+                let mut decode_candidate = String::new();
+
+                let mut creating_decode_candidate = true;
+                while creating_decode_candidate {
+                    for mut char_iter in decoded_string_chars.iter_mut() {
+                        match char_iter.next()  {
+                            None => creating_decode_candidate = false,
+                            Some(c) => decode_candidate.push(c)
+                        }
+                    }
+                }
+
+                println!("{}", decode_candidate);
+                return Ok(decode_candidate);
+            }
+            None => return Err("Find repeating xor could not find any edit distances \
+                                and couldn't calcuate any key sizes".to_owned())
+        } 
     }
 }
 
