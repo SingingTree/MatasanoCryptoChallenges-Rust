@@ -4,7 +4,6 @@ use std::str::Chars;
 use std::borrow::Borrow;
 use single_byte_xor::SingleByteXorDecodable;
 use utility;
-use rust_hamming_distance::bitwise_hamming_distance::BitwiseHammingDistancable;
 
 pub trait RepeatingXorEncodable {
     type Output;
@@ -42,7 +41,7 @@ impl<I : Iterator + Clone> RepeatingXorEncodable for I
 impl RepeatingXorDecodable for [u8] {
     type Output = Result<String, String>;
 
-    fn find_repeating_xor_decode(&self, 
+    fn find_repeating_xor_decode(&self,
                                  character_frequencies : &BTreeMap<char, f32>)
                                  -> Result<String, String> {
 
@@ -51,40 +50,11 @@ impl RepeatingXorDecodable for [u8] {
         if self.len() < 1 {
             return Ok(String::new());
         }
-        let mut normalised_edit_distance_and_lengths = Vec::new();
-
-        if self.len() <= 2 {
-            normalised_edit_distance_and_lengths.push((0f32, 1));
-        } else {
-            let mut edit_distance = self[..1].bitwise_hamming_distance(&self[1..2]);
-            match edit_distance {
-                Ok(ed) => normalised_edit_distance_and_lengths.push((ed as f32, 1)),
-                Err(e) => return Err("Find repeating xor failed attempting to calulate \
-                                      hamming distance on iteration 1 with following \
-                                      error\n".to_owned() + e)
-            }
-            for possible_key_len in 2..40 {
-                if possible_key_len > self.len() / 2 {
-                    break;
-                }
-                edit_distance = self[..possible_key_len].bitwise_hamming_distance(&self[possible_key_len..possible_key_len * 2]);
-                match edit_distance {
-                    Ok(ed) => {
-                        let normalised_ed = (ed as f32) / (possible_key_len as f32);
-                        normalised_edit_distance_and_lengths.push((normalised_ed, possible_key_len))
-                    },
-                    Err(e) => return Err("Find repeating xor failed attempting to calulate \
-                                      hamming distance on iteration ".to_owned() +
-                                      &possible_key_len.to_string() +
-                                      &" with following error\n".to_owned() + e)
-                }
-            }
-        }
-        normalised_edit_distance_and_lengths.sort_by(|&(ed1, _), &(ed2, _)|
-            ed2.partial_cmp(&ed1).unwrap());
-        for &(ed, len) in normalised_edit_distance_and_lengths.iter() {
-            println!("{:?}, {:?}", ed, len);
-        }
+        let mut normalised_edit_distance_and_lengths =
+            match utility::find_normalized_edit_distances(self) {
+            Ok(x) => x,
+            Err(e) => return Err(e)
+        };
         // Got our edit distances, now we can use the top however many as possible keys
 
         // Create n vectors for each different char in the key

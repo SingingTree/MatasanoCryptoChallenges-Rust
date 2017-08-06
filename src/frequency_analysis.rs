@@ -1,6 +1,5 @@
 use std::collections::btree_map::{BTreeMap, Entry};
 use std::iter::IntoIterator;
-use num::traits::Float;
 use std::str::Chars;
 
 pub trait FrequencyAnalysable {
