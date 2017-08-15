@@ -60,10 +60,14 @@ pub fn character_frequency_distance(characters : Chars, character_frequencies : 
 	for (k, v) in character_freqs {
 			// Calculate freq difference here by taking difference between actual and ideal char occurrence and adding it to the difference
 			match k.to_lowercase().next() {
-				None => {assert!(false, "to_lowercase returned 0 results during character_frequency_distance. Don't think this should happen")}
+				None => {
+					panic!("to_lowercase returned 0 results during character_frequency_distance")
+				}
 				Some(c) => match character_frequencies.get(&c) {
 					None => {difference_from_specified_freqs += v}
-					Some(frequency) => { difference_from_specified_freqs += (*frequency - v).abs(); }
+					Some(frequency) => {
+						difference_from_specified_freqs += (*frequency - v).abs();
+					}
 				}
 			}
 		}
