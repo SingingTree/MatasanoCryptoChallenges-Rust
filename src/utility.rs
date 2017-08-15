@@ -103,7 +103,9 @@ mod tests {
     #[test]
     fn normalized_edit_distances() {
         let bytes1 = [0x01, 0x02]; // Distance of 2 at len 1
-        let bytes2 = [0x01, 0x02, 0x01, 0x03]; // Distance of 0.5 at len 2
+        let bytes2 = [0x01, 0x02, 0x01, 0x03]; // 0.5 at len 2
+        let bytes3 = [0x01, 0x02, 0x03, 0x01, 0x03, 0x03, 0x07]; // 0.33.. at 3
+        let bytes4 = [0x01, 0x02, 0x01, 0x02, 0x03, 0x03, 0x07, 0x08]; // 0 at 2
 
         let edit_distances1 = find_normalized_edit_distances(&bytes1).unwrap();
         assert!(edit_distances1[0].0.approx_equal(2f32));
@@ -112,5 +114,13 @@ mod tests {
         let edit_distances2 = find_normalized_edit_distances(&bytes2).unwrap();
         assert!(edit_distances2[0].0.approx_equal(0.5f32));
         assert!(edit_distances2[0].1 == 2);
+
+        let edit_distances3 = find_normalized_edit_distances(&bytes3).unwrap();
+        assert!(edit_distances3[0].0.approx_equal(0.333333333f32));
+        assert!(edit_distances3[0].1 == 3);
+
+        let edit_distances4 = find_normalized_edit_distances(&bytes4).unwrap();
+        assert!(edit_distances4[0].0.approx_equal(0f32));
+        assert!(edit_distances4[0].1 == 2);
     }
 }
